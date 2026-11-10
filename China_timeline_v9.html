@@ -1,0 +1,2673 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Línea de Tiempo Sinusoidal: Historia de China (1780 - 2050)</title>
+  <style>
+    :root {
+      --bg-dark: #0a0f18;
+      --card-bg: #111827;
+      --card-border: #1e293b;
+      --text-main: #f1f5f9;
+      --text-muted: #94a3b8;
+      --gold: #d4af37;
+      --gold-light: #fef08a;
+      --red-china: #dc2626;
+      --red-bright: #ef4444;
+      --cyan: #38bdf8;
+      --stage1-color: #38bdf8;
+      --stage2-color: #f59e0b;
+      --stage3-color: #ef4444;
+      --stage4-color: #10b981;
+      --stage5-color: #a855f7;
+      --stage6-color: #ec4899;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    }
+
+    html, body {
+      height: 100vh;
+      max-height: 100vh;
+      overflow: hidden;
+      background-color: var(--bg-dark);
+      color: var(--text-main);
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* Encabezado */
+    header {
+      background: linear-gradient(180deg, #161e2e 0%, var(--bg-dark) 100%);
+      padding: 8px 18px 6px;
+      border-bottom: 1px solid var(--card-border);
+      flex-shrink: 0;
+      z-index: 40;
+    }
+
+    .header-top {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 12px;
+      position: relative;
+    }
+
+    h1 {
+      font-size: 1.45rem;
+      color: #fff;
+      letter-spacing: -0.3px;
+      display: inline-flex;
+      align-items: baseline;
+      gap: 6px;
+    }
+
+    h1 span {
+      color: var(--gold);
+      font-family: "Noto Serif SC", serif;
+      font-weight: normal;
+      font-size: 1.25rem;
+    }
+
+    .info-btn {
+      width: 26px;
+      height: 26px;
+      border-radius: 50%;
+      background: rgba(212, 175, 55, 0.15);
+      border: 1.5px solid var(--gold);
+      color: var(--gold);
+      font-size: 0.95rem;
+      font-weight: bold;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s ease;
+      user-select: none;
+    }
+
+    .info-btn:hover {
+      background: var(--gold);
+      color: #0b1120;
+      box-shadow: 0 0 10px rgba(212, 175, 55, 0.5);
+      transform: scale(1.08);
+    }
+
+    .info-popover {
+      position: absolute;
+      top: calc(100% + 8px);
+      left: 50%;
+      transform: translateX(-50%);
+      background: #111a2e;
+      border: 1px solid var(--gold);
+      color: #e2e8f0;
+      padding: 12px 16px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      line-height: 1.45;
+      max-width: 580px;
+      width: 90vw;
+      box-shadow: 0 10px 30px rgba(0,0,0,0.85), 0 0 15px rgba(212, 175, 55, 0.2);
+      z-index: 80;
+      display: none;
+      animation: popoverFadeIn 0.2s ease-out;
+    }
+
+    .info-popover.active {
+      display: block;
+    }
+
+    .info-popover::before {
+      content: "";
+      position: absolute;
+      top: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-width: 0 6px 6px 6px;
+      border-style: solid;
+      border-color: transparent transparent var(--gold) transparent;
+    }
+
+    @keyframes popoverFadeIn {
+      from { opacity: 0; transform: translate(-50%, -6px); }
+      to { opacity: 1; transform: translate(-50%, 0); }
+    }
+
+    .controls-row {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 8px;
+      justify-content: center;
+      align-items: center;
+      margin-top: 5px;
+    }
+
+    .nav-btn {
+      background: var(--card-bg);
+      border: 1px solid var(--card-border);
+      color: var(--text-main);
+      padding: 4px 10px;
+      border-radius: 5px;
+      font-size: 0.76rem;
+      cursor: pointer;
+      display: inline-flex;
+      align-items: center;
+      gap: 4px;
+      transition: all 0.2s ease;
+    }
+
+    .nav-btn:hover {
+      background: #1e293b;
+      border-color: var(--gold);
+      color: var(--gold);
+    }
+
+    .legend-indicators {
+      display: flex;
+      gap: 12px;
+      font-size: 0.74rem;
+      color: var(--text-muted);
+      margin-left: 6px;
+    }
+
+    .legend-item {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+    }
+
+    .legend-dot {
+      width: 9px;
+      height: 9px;
+      border-radius: 50%;
+      background: var(--red-bright);
+      box-shadow: 0 0 6px var(--red-bright);
+    }
+
+    .legend-wave {
+      width: 20px;
+      height: 3px;
+      background: var(--gold);
+      border-radius: 2px;
+    }
+
+    /* Contenedor horizontal */
+    .timeline-viewport {
+      flex: 1;
+      height: calc(100vh - 78px);
+      overflow-x: auto;
+      overflow-y: hidden;
+      padding: 6px 18px 10px;
+      cursor: grab;
+      user-select: none;
+      scrollbar-width: thin;
+      scrollbar-color: var(--gold) #111827;
+      display: flex;
+    }
+
+    .timeline-viewport:active {
+      cursor: grabbing;
+    }
+
+    .timeline-viewport::-webkit-scrollbar {
+      height: 8px;
+    }
+
+    .timeline-viewport::-webkit-scrollbar-track {
+      background: #0f172a;
+    }
+
+    .timeline-viewport::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 4px;
+      border: 2px solid #0f172a;
+    }
+
+    .timeline-viewport::-webkit-scrollbar-thumb:hover {
+      background: var(--gold);
+    }
+
+    .timeline-canvas {
+      display: flex;
+      width: 3600px; /* 6 strips * 600px */
+      height: 100%;
+      position: relative;
+    }
+
+    .time-strip {
+      width: 600px;
+      height: 100%;
+      flex-shrink: 0;
+      border-right: 2px dashed #223049;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .time-strip:first-child {
+      border-left: 2px dashed #223049;
+    }
+
+    /* Media franja específica para la última etapa */
+    .time-strip.half-strip {
+      width: 300px;
+    }
+
+    .strip-header {
+      padding: 6px 12px;
+      background: rgba(17, 24, 39, 0.7);
+      border-bottom: 1px solid var(--card-border);
+      border-top: 3px solid var(--gold);
+      flex-shrink: 0;
+    }
+
+    .strip-tag {
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      letter-spacing: 0.5px;
+    }
+
+    .strip-title {
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: #fff;
+      margin: 1px 0;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .strip-wave-formula {
+      font-size: 0.72rem;
+      color: var(--cyan);
+      font-family: monospace;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    /* Caja de la onda sinusoidal */
+    .wave-stage-box {
+      height: 310px; /* Al menos 300px */
+      flex-shrink: 0;
+      position: relative;
+      background: radial-gradient(circle at 50% 50%, rgba(15, 23, 42, 0.4) 0%, rgba(10, 15, 24, 0.95) 100%);
+      border-bottom: 1px solid #1e293b;
+    }
+
+    .wave-stage-box svg.wave-svg {
+      width: 100%;
+      height: 100%;
+      display: block;
+    }
+
+    .event-node {
+      position: absolute;
+      transform: translate(-50%, -50%);
+      cursor: pointer;
+      z-index: 10;
+      transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    }
+
+    .event-node:hover {
+      transform: translate(-50%, -50%) scale(1.28);
+    }
+
+    .node-pin {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      background: var(--red-china);
+      border: 2.5px solid #fff;
+      box-shadow: 0 0 8px rgba(239, 68, 68, 0.9), 0 0 16px rgba(239, 68, 68, 0.5);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      animation: pulseNode 2.6s infinite ease-in-out;
+    }
+
+    @keyframes pulseNode {
+      0%, 100% { box-shadow: 0 0 6px rgba(239, 68, 68, 0.8); }
+      50% { box-shadow: 0 0 14px rgba(239, 68, 68, 1), 0 0 20px rgba(212, 175, 55, 0.6); }
+    }
+
+    .node-inner {
+      width: 5px;
+      height: 5px;
+      background: #fff;
+      border-radius: 50%;
+    }
+
+    .node-label {
+      position: absolute;
+      top: -21px;
+      left: 50%;
+      transform: translateX(-50%);
+      background: #0f172a;
+      border: 1px solid var(--gold);
+      color: var(--gold-light);
+      padding: 1px 6px;
+      border-radius: 3px;
+      font-size: 0.69rem;
+      font-weight: 700;
+      white-space: nowrap;
+      pointer-events: none;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.6);
+    }
+
+    .node-label.label-below {
+      top: 21px;
+    }
+
+    /* Panel de Occidente */
+    .western-panel {
+      background: #0d1424;
+      padding: 8px 12px;
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      border-top: 2px solid #334155;
+      overflow-y: auto; /* Internal clean scroll only if display is exceptionally short */
+      scrollbar-width: thin;
+      scrollbar-color: #334155 #0d1424;
+    }
+
+    .western-panel::-webkit-scrollbar {
+      width: 5px;
+    }
+    .western-panel::-webkit-scrollbar-thumb {
+      background: #334155;
+      border-radius: 3px;
+    }
+
+    .western-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 5px;
+      font-size: 0.68rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: #93c5fd;
+      letter-spacing: 0.5px;
+    }
+
+    .western-badge::before {
+      content: "";
+      width: 6px;
+      height: 6px;
+      background: #38bdf8;
+      border-radius: 50%;
+    }
+
+    .western-title {
+      font-size: 0.86rem;
+      color: #fff;
+      font-weight: 600;
+      line-height: 1.25;
+    }
+
+    .western-centro {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      background: rgba(56, 189, 248, 0.08);
+      border-left: 3px solid var(--cyan);
+      border-radius: 4px;
+      padding: 3px 8px;
+      font-size: 0.76rem;
+      margin-bottom: 2px;
+    }
+
+    .western-centro-label {
+      font-size: 0.68rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.5px;
+      color: var(--cyan);
+      flex-shrink: 0;
+    }
+
+    .western-centro-val {
+      color: #f1f5f9;
+      font-weight: 600;
+    }
+
+    .western-content-row {
+      display: flex;
+      flex-direction: row;
+      gap: 12px;
+      align-items: stretch;
+      width: 100%;
+    }
+
+    .western-img-wrap {
+      width: 180px;
+      min-width: 160px;
+      max-width: 190px;
+      height: 110px;
+      flex-shrink: 0;
+      border-radius: 6px;
+      overflow: hidden;
+      border: 1px solid #1e293b;
+      background: #090d14;
+      position: relative;
+    }
+
+    .western-img-wrap img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      transition: transform 0.3s ease;
+    }
+
+    .western-img-wrap:hover img {
+      transform: scale(1.04);
+    }
+
+    .western-desc {
+      flex: 1;
+      font-size: 0.78rem;
+      color: #cbd5e1;
+      line-height: 1.38;
+      display: flex;
+      align-items: center;
+    }
+
+    /* Authors Box in Western Panel */
+    .authors-accordion {
+      background: #111a2e;
+      border: 1px solid #1e293b;
+      border-radius: 5px;
+      padding: 6px 9px;
+      margin-top: auto;
+    }
+
+    .authors-title {
+      font-size: 0.7rem;
+      color: var(--gold);
+      font-weight: bold;
+      text-transform: uppercase;
+      margin-bottom: 4px;
+      letter-spacing: 0.5px;
+    }
+
+    .authors-list {
+      list-style: none;
+      display: flex;
+      flex-direction: column;
+      gap: 4px;
+    }
+
+    .authors-list li {
+      font-size: 0.71rem;
+      color: #94a3b8;
+      line-height: 1.28;
+    }
+
+    
+    /* Caja de Gran Signo de Interrogación para Franja 6 */
+    .western-question-box {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      background: radial-gradient(circle at 50% 50%, rgba(236, 72, 153, 0.12) 0%, rgba(13, 20, 36, 0.8) 100%);
+      border: 1px dashed rgba(236, 72, 153, 0.4);
+      border-radius: 8px;
+      padding: 12px;
+      text-align: center;
+      min-height: 130px;
+    }
+
+    .giant-question-mark {
+      font-size: 4.8rem;
+      font-weight: 900;
+      line-height: 1;
+      color: var(--stage6-color);
+      text-shadow: 0 0 25px rgba(236, 72, 153, 0.6), 0 0 50px rgba(236, 72, 153, 0.3);
+      user-select: none;
+      animation: pulseQuestion 3s ease-in-out infinite;
+    }
+
+    @keyframes pulseQuestion {
+      0%, 100% {
+        transform: scale(1);
+        opacity: 0.85;
+      }
+      50% {
+        transform: scale(1.12);
+        opacity: 1;
+        text-shadow: 0 0 35px rgba(236, 72, 153, 0.9), 0 0 60px rgba(212, 175, 55, 0.5);
+      }
+    }
+
+    .question-caption {
+      font-size: 0.72rem;
+      color: #94a3b8;
+      margin-top: 6px;
+      font-weight: 600;
+      letter-spacing: 0.5px;
+      text-transform: uppercase;
+    }
+
+    /* Modal emergente */
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(4, 7, 14, 0.88);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 100;
+      padding: 20px;
+    }
+
+    .modal-overlay.active {
+      display: flex;
+    }
+
+    .modal-window {
+      background: #0f172a;
+      border: 1px solid var(--gold);
+      box-shadow: 0 10px 40px rgba(0,0,0,0.85), 0 0 30px rgba(212, 175, 55, 0.3);
+      border-radius: 14px;
+      max-width: 1040px;
+      width: 100%;
+      max-height: 92vh;
+      display: flex;
+      flex-direction: column;
+      overflow: hidden;
+      animation: modalFadeIn 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    @keyframes modalFadeIn {
+      from { opacity: 0; transform: scale(0.95); }
+      to { opacity: 1; transform: scale(1); }
+    }
+
+    .modal-header {
+      padding: 14px 20px;
+      background: #162033;
+      border-bottom: 1px solid #223049;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header-info {
+      display: flex;
+      align-items: baseline;
+      gap: 12px;
+    }
+
+    .modal-year-tag {
+      background: var(--red-china);
+      color: #fff;
+      font-weight: bold;
+      padding: 4px 10px;
+      border-radius: 6px;
+      font-size: 0.9rem;
+    }
+
+    .modal-wave-loc {
+      color: var(--gold);
+      font-size: 0.83rem;
+      font-weight: 600;
+    }
+
+    .close-modal-btn {
+      background: none;
+      border: 1px solid #334155;
+      color: #94a3b8;
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      font-size: 1.2rem;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+    }
+
+    .close-modal-btn:hover {
+      background: #ef4444;
+      color: #fff;
+      border-color: #ef4444;
+    }
+
+    .modal-body-2col {
+      display: grid;
+      grid-template-columns: 1.15fr 1fr;
+      gap: 20px;
+      padding: 20px 24px;
+      overflow-y: auto;
+    }
+
+    .modal-left-col, .modal-right-col {
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .modal-title-row {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+    }
+
+    .modal-title {
+      font-size: 1.3rem;
+      color: #fff;
+      line-height: 1.3;
+    }
+
+    .modal-wiki-btn {
+      align-self: flex-start;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      background: rgba(212, 175, 55, 0.12);
+      border: 1px solid var(--gold);
+      color: var(--gold-light);
+      padding: 4px 10px;
+      border-radius: 4px;
+      font-size: 0.74rem;
+      text-decoration: none;
+      transition: all 0.2s ease;
+    }
+
+    .modal-wiki-btn:hover {
+      background: var(--gold);
+      color: #0b1120;
+    }
+
+    .modal-image-card {
+      background: #090d14;
+      border: 1px solid #1e293b;
+      border-radius: 9px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      position: relative;
+    }
+
+    .modal-image-card .card-caption {
+      padding: 7px 12px;
+      background: #111827;
+      font-size: 0.76rem;
+      color: var(--gold);
+      border-top: 1px solid #1e293b;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-image-card img {
+      width: 100%;
+      height: 220px;
+      object-fit: cover;
+      display: block;
+      background: #090d14;
+    }
+
+    .modal-desc-box {
+      font-size: 0.92rem;
+      color: #cbd5e1;
+      line-height: 1.55;
+      background: #111827;
+      padding: 12px 14px;
+      border-radius: 8px;
+      border: 1px solid #1e293b;
+    }
+
+
+    /* Sección de Obras y Autores Sinológicos en el Modal */
+    .modal-authors-section {
+      background: #111a2e;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 12px 14px;
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .modal-authors-header {
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 0.76rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      color: var(--gold);
+      letter-spacing: 0.5px;
+    }
+
+    .modal-authors-list {
+      display: flex;
+      flex-direction: column;
+      gap: 8px;
+    }
+
+    .author-source-card {
+      background: #090d14;
+      border: 1px solid #1e293b;
+      border-left: 3px solid var(--gold);
+      border-radius: 5px;
+      padding: 8px 10px;
+      font-size: 0.78rem;
+      line-height: 1.4;
+    }
+
+    .author-name-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 3px;
+    }
+
+    .author-name-row strong {
+      color: var(--gold-light);
+      font-size: 0.8rem;
+    }
+
+    .author-work-link {
+      color: var(--cyan);
+      text-decoration: none;
+      font-size: 0.72rem;
+      font-weight: 600;
+      border-bottom: 1px dashed rgba(56, 189, 248, 0.4);
+    }
+
+    .author-work-link:hover {
+      color: #fff;
+      border-bottom-color: #fff;
+    }
+
+    .author-work-title {
+      color: #e2e8f0;
+      font-style: italic;
+    }
+
+    .author-chapters {
+      color: #94a3b8;
+      font-size: 0.74rem;
+      margin-top: 2px;
+    }
+
+    .author-focus {
+      color: #cbd5e1;
+      font-size: 0.75rem;
+      margin-top: 4px;
+    }
+
+    .map-header-badge {
+      font-size: 0.76rem;
+      text-transform: uppercase;
+      font-weight: 700;
+      color: var(--cyan);
+      display: flex;
+      align-items: center;
+      gap: 6px;
+    }
+
+    .map-header-badge::before {
+      content: "";
+      width: 7px;
+      height: 7px;
+      background: var(--cyan);
+      border-radius: 50%;
+    }
+
+    .modal-right-col .modal-image-card img {
+      height: 275px;
+    }
+
+    .map-details-box {
+      background: #111827;
+      border: 1px solid #1e293b;
+      border-radius: 8px;
+      padding: 11px 13px;
+      font-size: 0.83rem;
+      color: #94a3b8;
+    }
+
+    .map-details-box strong {
+      color: #f1f5f9;
+    }
+
+    .img-source-badge {
+      font-size: 0.7rem;
+      color: #64748b;
+      font-family: monospace;
+      max-width: 180px;
+      white-space: nowrap;
+      overflow: hidden;
+      text-overflow: ellipsis;
+    }
+
+    .img-placeholder-fallback {
+      display: none;
+      height: 100%;
+      min-height: 160px;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 18px;
+      background: linear-gradient(135deg, #131c2e 0%, #0d131f 100%);
+      text-align: center;
+      color: #94a3b8;
+    }
+
+    .img-fallback-active img {
+      display: none !important;
+    }
+
+    .img-fallback-active .img-placeholder-fallback {
+      display: flex !important;
+    }
+
+    .img-placeholder-fallback .icon {
+      font-size: 1.8rem;
+      margin-bottom: 6px;
+      color: var(--gold);
+    }
+
+    .img-placeholder-fallback .title {
+      font-weight: 600;
+      color: #e2e8f0;
+      font-size: 0.83rem;
+    }
+
+    .img-placeholder-fallback .sub {
+      font-size: 0.73rem;
+      color: #64748b;
+      margin-top: 3px;
+    }
+
+    @media (max-width: 850px) {
+      .modal-body-2col {
+        grid-template-columns: 1fr;
+      }
+      .modal-right-col .modal-image-card img {
+        height: 220px;
+      }
+    }
+
+    /* Estilos específicos para pantallas angostas / teléfonos (menos de 500px) */
+    @media (max-width: 500px) {
+      header {
+        padding: 6px 10px 4px;
+      }
+
+      h1 {
+        font-size: 1.15rem;
+      }
+
+      h1 span {
+        font-size: 1rem;
+      }
+
+      .controls-row {
+        gap: 5px;
+      }
+
+      .nav-btn {
+        padding: 3px 7px;
+        font-size: 0.7rem;
+      }
+
+      .legend-indicators {
+        display: none;
+      }
+
+      .timeline-viewport {
+        padding: 4px 8px 8px;
+        height: calc(100vh - 72px);
+      }
+
+      .timeline-canvas {
+        width: max-content;
+      }
+
+      .time-strip {
+        width: 90vw !important;
+        max-width: 90vw !important;
+        min-width: 280px;
+      }
+
+      .time-strip.half-strip {
+        width: 45vw !important;
+        max-width: 45vw !important;
+        min-width: 140px;
+      }
+
+      .wave-stage-box {
+        height: 175px !important;
+      }
+
+      .western-panel {
+        padding: 6px 10px;
+        gap: 5px;
+      }
+
+      .western-title {
+        font-size: 0.8rem;
+      }
+
+      .western-content-row {
+        gap: 8px;
+      }
+
+      .western-img-wrap {
+        width: 120px;
+        min-width: 110px;
+        max-width: 130px;
+        height: 85px;
+      }
+
+      .western-desc {
+        font-size: 0.73rem;
+        line-height: 1.3;
+      }
+
+      .authors-accordion {
+        padding: 5px 8px;
+      }
+
+      .authors-title {
+        font-size: 0.67rem;
+      }
+
+      .authors-list li {
+        font-size: 0.68rem;
+      }
+
+      .modal-window {
+        max-height: 96vh;
+        border-radius: 10px;
+      }
+
+      .modal-body-2col {
+        padding: 14px 16px;
+        gap: 14px;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <header>
+    <div class="header-top">
+      <h1>Historia de China y Paralelo Global <span>(1780 – 2050)</span></h1>
+      <button id="infoBtn" class="info-btn" title="Información sobre la metodología de la onda">?</button>
+      
+      <div id="infoPopover" class="info-popover">
+        Modelo de onda sinusoidal continua con valles y crestas suavemente redondeados. En cada franja temporal, los eventos de China se ubican en la onda mostrando únicamente su fecha; al hacer clic se despliega la ventana flotante en 2 columnas con la imagen ilustrativa y su mapa oficial del documento.
+      </div>
+    </div>
+
+    <div class="controls-row">
+      <button class="nav-btn" onclick="scrollTimeline(-350)">&#8592; Desplazar Izquierda</button>
+      <button class="nav-btn" onclick="scrollToStage(1)">Onda 1 (1780)</button>
+      <button class="nav-btn" onclick="scrollToStage(2)">Onda 2 (1844)</button>
+      <button class="nav-btn" onclick="scrollToStage(3)">Onda 3 (1890)</button>
+      <button class="nav-btn" onclick="scrollToStage(4)">Onda 4 (1940)</button>
+      <button class="nav-btn" onclick="scrollToStage(5)">Onda 5 (1990)</button>
+      <button class="nav-btn" onclick="scrollToStage(6)">Onda 6 (2030)</button>
+      <button class="nav-btn" onclick="scrollTimeline(350)">Desplazar Derecha &#8594;</button>
+
+      <div class="legend-indicators">
+        <span class="legend-item"><span class="legend-wave"></span> Onda Sinusoidal</span>
+        <span class="legend-item"><span class="legend-dot"></span> Evento China</span>
+      </div>
+    </div>
+  </header>
+
+  <div class="timeline-viewport" id="timelineViewport">
+    <div class="timeline-canvas" id="timelineCanvas"></div>
+  </div>
+
+  <div class="modal-overlay" id="modalOverlay">
+    <div class="modal-window">
+      <div class="modal-header">
+        <div class="modal-header-info">
+          <span class="modal-year-tag" id="modalYear"></span>
+          <span class="modal-wave-loc" id="modalStagePos"></span>
+        </div>
+        <button class="close-modal-btn" id="closeModalBtn" onclick="closeModal()">&times;</button>
+      </div>
+
+      <div class="modal-body-2col">
+        <div class="modal-left-col">
+          <div class="modal-title-row">
+            <h2 class="modal-title" id="modalTitle"></h2>
+            <a id="modalWikiLink" class="modal-wiki-btn" href="#" target="_blank" rel="noopener noreferrer">
+              <span>📖</span> <span id="modalWikiLabel">Artículo en Wikipedia</span> &nearr;
+            </a>
+          </div>
+          
+          <div class="modal-image-card" id="modalIllusCard">
+            <img id="modalIllusImg" src="" alt="Ilustración Histórica" onerror="handleImgError(this)">
+            <div class="img-placeholder-fallback">
+              <div class="icon">🖼️</div>
+              <div class="title" id="modalIllusFallbackTitle">Ilustración Histórica</div>
+              <div class="sub">Referencia del documento Investigacion_V2.md</div>
+            </div>
+            <div class="card-caption">
+              <span id="modalIllusCaption">Ilustración Histórica</span>
+              <span class="img-source-badge" id="modalIllusSrc">Doc MD</span>
+            </div>
+          </div>
+
+
+          <div class="modal-desc-box" id="modalDesc"></div>
+          
+          <div id="modalAuthorsContainer" class="modal-authors-section" style="display: none;"></div>
+        </div>
+
+        <div class="modal-right-col">
+          <div class="map-header-badge">Cartografía y Localización Territorial</div>
+          
+          <div class="modal-image-card" id="modalMapCard">
+            <img id="modalMapImg" src="" alt="Mapa de China y Territorio" onerror="handleImgError(this)">
+            <div class="img-placeholder-fallback">
+              <div class="icon">🗺️</div>
+              <div class="title" id="modalMapFallbackTitle">Mapa Histórico</div>
+              <div class="sub">Referencia del documento Investigacion_V2.md</div>
+            </div>
+            <div class="card-caption">
+              <span id="modalMapCaption">Mapa Histórico</span>
+              <span class="img-source-badge" id="modalMapSrc">Doc MD</span>
+            </div>
+          </div>
+
+          <div class="map-details-box" id="modalMapDetails"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    const stagesData = [
+  {
+    "id": 1,
+    "name": "1. El Ocaso Qing y el Choque de Dos Mundos",
+    "wave": "Onda 1: Valle (1780) ➔ Cresta (1810) ➔ Valle (1844)",
+    "start_year": 1780,
+    "crest_year": 1810,
+    "end_year": 1844,
+    "western": {
+      "title": "Primera Revolución Industrial & Era Napoleónica",
+      "desc": "Esta franja temporal coincide con la Primera Revolución Industrial (mecanización, máquina de vapor) y el ciclo de la Revolución Francesa y las Guerras Napoleónicas (cuyo apogeo europeo concuerda con la cresta de 1810).",
+      "img": "https://tse1.mm.bing.net/th?q=Primera+Revolucion+Industrial+pintura+historica",
+      "img_label": "Primera Revolución Industrial",
+      "centro": "Gran Bretaña y Francia (hasta 1815)",
+      "wiki": "https://es.wikipedia.org/wiki/Primera_Revoluci%C3%B3n_Industrial",
+      "wiki_label": "Wikipedia: Primera Rev. Industrial"
+    },
+    "authors": [
+      {
+        "author": "John K. Fairbank",
+        "text": "Analiza la secuencia desde la Misión Macartney (1793) hasta el Tratado de Nankín (1842) como el choque frontal entre el 'orden mundial chino' y el sistema de estados soberanos europeos.",
+        "unal_url": "https://bibliotecasunal.primo.exlibrisgroup.com/nde/search?vid=57UNDC_INST:57UNDC_INST_V1&tab=LibraryCatalog&search_scope=MyInstitution&lang=es&query=John%20K.%20Fairbank",
+        "google_url": "https://www.google.com/search?q=John%20K.%20Fairbank+sin%C3%B3logo+autor"
+      },
+      {
+        "author": "Jacques Gernet",
+        "text": "Al observar la Rebelión del Loto Blanco (1796-1804), argumenta que los verdaderos motores del cambio fueron presiones internas de 'larga duración': explosión demográfica y escasez de tierras.",
+        "unal_url": "https://bibliotecasunal.primo.exlibrisgroup.com/nde/search?vid=57UNDC_INST:57UNDC_INST_V1&tab=LibraryCatalog&search_scope=MyInstitution&lang=es&query=Jacques%20Gernet",
+        "google_url": "https://www.google.com/search?q=Jacques%20Gernet+sin%C3%B3logo+autor"
+      },
+      {
+        "author": "Naitō Konan",
+        "text": "Resta centralidad a la Guerra del Opio (1839). Plantea que los cambios estructurales son continuación de una 'modernidad' que China desarrollaba orgánicamente desde la dinastía Song.",
+        "unal_url": "https://bibliotecasunal.primo.exlibrisgroup.com/nde/search?vid=57UNDC_INST:57UNDC_INST_V1&tab=LibraryCatalog&search_scope=MyInstitution&lang=es&query=Nait%C5%8D%20Konan",
+        "google_url": "https://www.google.com/search?q=Nait%C5%8D%20Konan+sin%C3%B3logo+autor"
+      }
+    ],
+    "events": [
+      {
+        "id": "e1_1",
+        "year_display": "1780",
+        "year_val": 1780,
+        "title": "Consolidación de las fronteras máximas del Imperio Qing",
+        "stage_pos": "Valle inicial (1780)",
+        "desc": "Bajo el largo reinado de Qianlong, se consolidan las fronteras máximas del Imperio Qing mediante la integración y estabilización de Xinjiang, Tíbet y Mongolia bajo la hegemonía imperial de Pekín.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=Emperor+Qianlong+portrait",
+        "img_illus_title": "Emperador Qianlong",
+        "img_map": "https://tse1.mm.bing.net/th?q=Qing+dynasty+map+1780",
+        "img_map_title": "Mapa Imperio Qing 1780",
+        "map_focus": "China Imperial y Fronteras Máximas",
+        "wiki": "https://es.wikipedia.org/wiki/Qianlong",
+        "wiki_label": "Wikipedia: Emperador Qianlong",
+        "sinological_sources": [
+          {
+            "author": "Jacques Gernet",
+            "work": "El mundo chino (Le Monde chinois)",
+            "chapters": "Libro 8, Cap. 26: «La plenitud del siglo XVIII y la expansión continental»",
+            "focus": "Analiza la consolidación demográfica y territorial bajo Qianlong como el clímax de las fuerzas agrarias tradicionales de larga duración.",
+            "link": "https://www.worldcat.org/title/el-mundo-chino/oclc/630325493",
+            "link_type": "Ficha bibliográfica (WorldCat)"
+          },
+          {
+            "author": "John K. Fairbank",
+            "work": "China: A New History",
+            "chapters": "Cap. 7: «The High Qing: The Emperor Qianlong and Imperial Expansion»",
+            "focus": "Examina el sistema de control manchú y las conquistas de las Diez Grandes Campañas que definieron las fronteras imperiales.",
+            "link": "https://www.hup.harvard.edu/books/9780674018280",
+            "link_type": "Editorial / Catálogo"
+          }
+        ]
+      },
+      {
+        "id": "e1_2",
+        "year_display": "1793",
+        "year_val": 1793,
+        "title": "Misión diplomática británica de George Macartney",
+        "stage_pos": "Fase ascendente hacia la cresta",
+        "desc": "Misión diplomática británica de George Macartney, rechazada formalmente por el emperador Qianlong al negarse a abrir más puertos al comercio británico y establecer legación en Pekín.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=Macartney+Embassy+China",
+        "img_illus_title": "Misión Macartney",
+        "img_map": "https://tse1.mm.bing.net/th?q=Macartney+Embassy+route+map",
+        "img_map_title": "Mapa Ruta Misión Macartney",
+        "map_focus": "Ruta marítima y fluvial Cantón - Pekín",
+        "wiki": "https://es.wikipedia.org/wiki/Embajada_Macartney",
+        "wiki_label": "Wikipedia: Embajada Macartney",
+        "sinological_sources": [
+          {
+            "author": "John K. Fairbank",
+            "work": "The Chinese World Order: Traditional China's Foreign Relations",
+            "chapters": "Cap. 1 y Cap. 10: «Tributary System and the Western Powers»",
+            "focus": "Formula la célebre tesis del choque cultural entre el sistema tributario universal sinocéntrico y el orden westfaliano británico.",
+            "link": "https://www.hup.harvard.edu/books/9780674126008",
+            "link_type": "Editorial / Catálogo"
+          }
+        ]
+      },
+      {
+        "id": "e1_3",
+        "year_display": "1796-1804",
+        "year_val": 1800,
+        "title": "Rebelión del Loto Blanco",
+        "stage_pos": "Hacia la cresta de 1810",
+        "desc": "Rebelión del Loto Blanco, un levantamiento campesino y religioso en las zonas montañosas del interior que expuso con severidad la debilidad militar y el desgaste fiscal de la dinastía Qing.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=White+Lotus+Rebellion+China",
+        "img_illus_title": "Rebelión Loto Blanco",
+        "img_map": "https://tse1.mm.bing.net/th?q=White+Lotus+Rebellion+map",
+        "img_map_title": "Mapa Rebelión Loto Blanco",
+        "map_focus": "Región montañosa Sichuan-Shaanxi-Hubei",
+        "wiki": "https://es.wikipedia.org/wiki/Rebeli%C3%B3n_del_Loto_Blanco",
+        "wiki_label": "Wikipedia: Rebelión del Loto Blanco",
+        "sinological_sources": [
+          {
+            "author": "Jacques Gernet",
+            "work": "El mundo chino",
+            "chapters": "Libro 8, Cap. 27: «Las crisis del siglo XIX y las insurrecciones campesinas»",
+            "focus": "Demuestra que la rebelión fue impulsada por el desequilibrio entre el crecimiento poblacional exponencial y la saturación de tierras de cultivo.",
+            "link": "https://www.worldcat.org/title/el-mundo-chino/oclc/630325493",
+            "link_type": "Ficha bibliográfica (WorldCat)"
+          }
+        ]
+      },
+      {
+        "id": "e1_4",
+        "year_display": "1839",
+        "year_val": 1839,
+        "title": "Lin Zexu destruye el opio británico en Humen",
+        "stage_pos": "Fase descendente hacia el valle final",
+        "desc": "El comisionado imperial Lin Zexu destruye miles de cofres de opio británico confiscados en Humen, Cantón, detonando el conflicto diplomático y armado directo con el Imperio Británico.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=Lin+Zexu+destroying+opium+Humen",
+        "img_illus_title": "Lin Zexu destruyendo opio",
+        "img_map": "https://tse1.mm.bing.net/th?q=Canton+Humen+map+1839",
+        "img_map_title": "Mapa Cantón Humen 1839",
+        "map_focus": "Delta del Río de las Perlas, Humen y Cantón",
+        "wiki": "https://es.wikipedia.org/wiki/Lin_Zexu",
+        "wiki_label": "Wikipedia: Lin Zexu",
+        "sinological_sources": [
+          {
+            "author": "John K. Fairbank",
+            "work": "Trade and Diplomacy on the China Coast: The Opening of the Treaty Ports",
+            "chapters": "Cap. 2 y Cap. 3: «Commissioner Lin and the British Crisis»",
+            "focus": "Detalla la rígida política de Lin Zexu y la incompatibilidad diplomática y mercantil en el Delta del Río de las Perlas.",
+            "link": "https://www.hup.harvard.edu/books/9780674438347",
+            "link_type": "Editorial / Catálogo"
+          },
+          {
+            "author": "Naitō Konan",
+            "work": "Shinaron (Sobre China, 1914)",
+            "chapters": "Cap. 2: «La transformación social moderna y los límites del conflicto exterior»",
+            "focus": "Sostiene que la crisis de 1839 no inauguró una nueva era moderna, sino que continuó tendencias de descomposición sociopolítica iniciadas siglos antes.",
+            "link": "https://www.google.com/search?q=Naito+Konan+Shinaron+1914",
+            "link_type": "Búsqueda en Google (Obra histórica)"
+          }
+        ]
+      },
+      {
+        "id": "e1_5",
+        "year_display": "1839-1842",
+        "year_val": 1840.5,
+        "title": "Primera Guerra del Opio",
+        "stage_pos": "Aproximación al valle de 1844",
+        "desc": "Desarrollo de la Primera Guerra del Opio contra el poder naval y artillero británico, que culmina con la contundente derrota militar Qing y el colapso del aislamiento defensivo costero.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=First+Opium+War+battle",
+        "img_illus_title": "Primera Guerra del Opio",
+        "img_map": "https://tse1.mm.bing.net/th?q=First+Opium+War+map",
+        "img_map_title": "Mapa Primera Guerra del Opio",
+        "map_focus": "Operaciones navales a lo largo de la costa este",
+        "wiki": "https://es.wikipedia.org/wiki/Primera_Guerra_del_Opio",
+        "wiki_label": "Wikipedia: Primera Guerra del Opio",
+        "sinological_sources": [
+          {
+            "author": "John K. Fairbank",
+            "work": "Trade and Diplomacy on the China Coast",
+            "chapters": "Cap. 4: «The First Opium War and the Breakdown of the Coastal Defense»",
+            "focus": "Estudia la abrumadora superioridad militar y naval británica que forzó a Pekín a claudicar ante el bloqueo del Gran Canal.",
+            "link": "https://www.hup.harvard.edu/books/9780674438347",
+            "link_type": "Editorial / Catálogo"
+          },
+          {
+            "author": "Naitō Konan",
+            "work": "Shinaron",
+            "chapters": "Cap. 3: «El poder monárquico y la irrupción occidental»",
+            "focus": "Resta centralidad militar al conflicto frente al cambio endógeno de la aristocracia y la burocracia civil.",
+            "link": "https://www.google.com/search?q=Naito+Konan+Opium+War+Song+modernity",
+            "link_type": "Búsqueda en Google (Obra histórica)"
+          }
+        ]
+      },
+      {
+        "id": "e1_6",
+        "year_display": "1842",
+        "year_val": 1842,
+        "title": "Firma del Tratado de Nankín",
+        "stage_pos": "Inmediaciones del valle de 1844",
+        "desc": "Firma del Tratado de Nankín, el primer 'tratado desigual', que obligó a ceder Hong Kong a los británicos, pagar onerosas indemnizaciones y abrir cinco puertos al comercio internacional.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=Treaty+of+Nanking+1842",
+        "img_illus_title": "Tratado de Nankín",
+        "img_map": "https://tse1.mm.bing.net/th?q=Treaty+of+Nanking+treaty+ports+map",
+        "img_map_title": "Mapa Puertos Tratado Nankín",
+        "map_focus": "Puertos del Tratado (Shanghái, Cantón, Ningbo, Fuzhou, Amoy)",
+        "wiki": "https://es.wikipedia.org/wiki/Tratado_de_Nank%C3%ADn",
+        "wiki_label": "Wikipedia: Tratado de Nankín",
+        "sinological_sources": [
+          {
+            "author": "John K. Fairbank",
+            "work": "Trade and Diplomacy on the China Coast",
+            "chapters": "Cap. 5: «The Treaty Settlement of 1842–1844»",
+            "focus": "Pionero en conceptualizar el 'Treaty Century' y el nuevo marco institucional de los cinco puertos abiertos.",
+            "link": "https://www.hup.harvard.edu/books/9780674438347",
+            "link_type": "Editorial / Catálogo"
+          }
+        ]
+      },
+      {
+        "id": "e1_7",
+        "year_display": "1844",
+        "year_val": 1844,
+        "title": "Tratados de Wanghia y Whampoa",
+        "stage_pos": "Valle final (1844)",
+        "desc": "Firma del Tratado de Wanghia con EE. UU. y Tratado de Whampoa con Francia, institucionalizando las concesiones extranjeras y el principio de extraterritorialidad jurídica.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=Treaty+of+Wanghia+Whampoa",
+        "img_illus_title": "Tratados desiguales China 1844",
+        "img_map": "https://tse1.mm.bing.net/th?q=Foreign+concessions+in+China+map+19th+century",
+        "img_map_title": "Mapa Concesiones extranjeras China",
+        "map_focus": "Concesiones y enclaves extranjeros",
+        "wiki": "https://es.wikipedia.org/wiki/Tratado_de_Whampoa",
+        "wiki_label": "Wikipedia: Tratado de Whampoa",
+        "sinological_sources": [
+          {
+            "author": "John K. Fairbank",
+            "work": "Trade and Diplomacy on the China Coast",
+            "chapters": "Cap. 7: «The American and French Treaties: Extraterritoriality»",
+            "focus": "Analiza cómo la extraterritorialidad y la cláusula de nación más favorecida establecieron el orden colonial informal compartido.",
+            "link": "https://www.hup.harvard.edu/books/9780674438347",
+            "link_type": "Editorial / Catálogo"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 2,
+    "name": "2. Rebeliones y Esfuerzos de Modernización",
+    "wave": "Onda 2: Valle (1844) ➔ Cresta (1870) ➔ Valle (1890)",
+    "start_year": 1844,
+    "crest_year": 1870,
+    "end_year": 1890,
+    "western": {
+      "title": "Segunda Revolución Industrial & Unificaciones Nacionales",
+      "desc": "Coincide con el inicio de la Segunda Revolución Industrial (acero, electricidad) y los procesos de Unificación de Alemania e Italia, consolidados alrededor de la cresta de 1870.",
+      "img": "https://tse1.mm.bing.net/th?q=Second+Industrial+Revolution+steel+factory",
+      "img_label": "Segunda Revolución Industrial Acero",
+      "centro": "Gran Bretaña \"Taller del Mundo\"",
+      "wiki": "https://es.wikipedia.org/wiki/Segunda_Revoluci%C3%B3n_Industrial",
+      "wiki_label": "Wikipedia: Segunda Rev. Industrial"
+    },
+    "authors": [
+      {
+        "author": "Jonathan Spence",
+        "text": "Desmenuza la Rebelión Taiping enfocándose en Hong Xiuquan, mostrando cómo las ideas cristianas occidentales fueron reinterpretadas para movilizar a las masas.",
+        "unal_url": "https://bibliotecasunal.primo.exlibrisgroup.com/nde/search?vid=57UNDC_INST:57UNDC_INST_V1&tab=LibraryCatalog&search_scope=MyInstitution&lang=es&query=Jonathan%20Spence",
+        "google_url": "https://www.google.com/search?q=Jonathan%20Spence+sin%C3%B3logo+autor"
+      },
+      {
+        "author": "Ray Huang",
+        "text": "Evalúa el Auto-fortalecimiento hasta 1890. Argumenta que construir arsenales modernos falló porque el imperio carecía de una 'gestión numérica' y contabilidad moderna.",
+        "unal_url": "https://bibliotecasunal.primo.exlibrisgroup.com/nde/search?vid=57UNDC_INST:57UNDC_INST_V1&tab=LibraryCatalog&search_scope=MyInstitution&lang=es&query=Ray%20Huang",
+        "google_url": "https://www.google.com/search?q=Ray%20Huang+sin%C3%B3logo+autor"
+      },
+      {
+        "author": "Karl A. Wittfogel",
+        "text": "Interpreta los fracasos de la incipiente industrialización señalando que el 'Estado despótico' absorbió las tecnologías impidiendo el surgimiento de una burguesía independiente.",
+        "unal_url": "https://bibliotecasunal.primo.exlibrisgroup.com/nde/search?vid=57UNDC_INST:57UNDC_INST_V1&tab=LibraryCatalog&search_scope=MyInstitution&lang=es&query=Karl%20A.%20Wittfogel",
+        "google_url": "https://www.google.com/search?q=Karl%20A.%20Wittfogel+sin%C3%B3logo+autor"
+      }
+    ],
+    "events": [
+      {
+        "id": "e2_1",
+        "year_display": "1850-1864",
+        "year_val": 1857,
+        "title": "Rebelión Taiping",
+        "stage_pos": "Fase ascendente hacia la cresta de 1870",
+        "desc": "Rebelión Taiping, la guerra civil más sangrienta del siglo XIX (con sede en Nankín), que desarticuló las structures agrarias tradicionales y cobró decenas de millones de vidas.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=Taiping+Rebellion+battle",
+        "img_illus_title": "Rebelión Taiping",
+        "img_map": "https://tse1.mm.bing.net/th?q=Taiping+Rebellion+map+territory",
+        "img_map_title": "Mapa Rebelión Taiping",
+        "map_focus": "Cuenca del Río Yangtsé y Nankín (Tianjing)",
+        "wiki": "https://es.wikipedia.org/wiki/Rebeli%C3%B3n_Taiping",
+        "wiki_label": "Wikipedia: Rebelión Taiping",
+        "sinological_sources": [
+          {
+            "author": "Jonathan Spence",
+            "work": "God's Chinese Son: The Taiping Heavenly Kingdom of Hong Xiuquan",
+            "chapters": "Caps. 1 a 6: «The Visions», «The Gathering of the Flock» y «The Heavenly Capital»",
+            "focus": "Estudio monumental de la psicología mesiánica de Hong Xiuquan y la hibridación de la teología bíblica con el descontento milenarista campesino.",
+            "link": "https://wwnorton.com/books/Gods-Chinese-Son/",
+            "link_type": "Editorial / Catálogo"
+          }
+        ]
+      },
+      {
+        "id": "e2_2",
+        "year_display": "1856-1860",
+        "year_val": 1860,
+        "title": "Segunda Guerra del Opio y Saqueo de Pekín",
+        "stage_pos": "Aproximación a la cresta",
+        "desc": "Segunda Guerra del Opio y el saqueo e incendio del Antiguo Palacio de Verano en Pekín por las fuerzas invasoras anglo-francesas, forzando la apertura de embajadas occidentales permanentes.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=Old+Summer+Palace+destruction+1860",
+        "img_illus_title": "Saqueo Palacio de Verano",
+        "img_map": "https://tse1.mm.bing.net/th?q=Second+Opium+War+map+Beijing",
+        "img_map_title": "Mapa Segunda Guerra del Opio",
+        "map_focus": "Avance de Tianjin a Pekín",
+        "wiki": "https://es.wikipedia.org/wiki/Segunda_Guerra_del_Opio",
+        "wiki_label": "Wikipedia: Segunda Guerra del Opio",
+        "sinological_sources": [
+          {
+            "author": "Jonathan Spence",
+            "work": "The Search for Modern China",
+            "chapters": "Cap. 8: «Fragmentation and Reform: The Climax of Foreign Invasions»",
+            "focus": "Narra el trauma diplomático y cultural provocado por la destrucción de Yuanmingyuan por orden de Lord Elgin.",
+            "link": "https://wwnorton.com/books/The-Search-for-Modern-China/",
+            "link_type": "Editorial / Catálogo"
+          }
+        ]
+      },
+      {
+        "id": "e2_3",
+        "year_display": "1861",
+        "year_val": 1861,
+        "title": "Creación del Zongli Yamen y Auto-fortalecimiento",
+        "stage_pos": "Fase previa a la cresta",
+        "desc": "Creación del Zongli Yamen, marcando el inicio del Movimiento de Auto-fortalecimiento para modernizar los arsenales, la flota y la industria militar preservando la esencia confuciana.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=Zongli+Yamen+officials",
+        "img_illus_title": "Zongli Yamen",
+        "img_map": "https://tse1.mm.bing.net/th?q=Self-Strengthening+Movement+arsenals+map+China",
+        "img_map_title": "Mapa Movimiento Autofortalecimiento Arsenales",
+        "map_focus": "Arsenales en Shanghái, Tianjin y Fuzhou",
+        "wiki": "https://es.wikipedia.org/wiki/Zongli_Yamen",
+        "wiki_label": "Wikipedia: Zongli Yamen",
+        "sinological_sources": [
+          {
+            "author": "Ray Huang",
+            "work": "China: A Macro History",
+            "chapters": "Cap. 17: «The Late Qing Self-Strengthening: Failure of Numerical Management»",
+            "focus": "Argumenta que los arsenales modernos fracasaron al carecer de una estructura contable, legal e impositiva moderna.",
+            "link": "https://www.routledge.com/China-A-Macro-History/Huang/p/book/9781563247316",
+            "link_type": "Editorial / Catálogo"
+          },
+          {
+            "author": "Karl A. Wittfogel",
+            "work": "Despotismo Oriental: Estudio comparativo del poder totalitario",
+            "chapters": "Cap. 9: «El aparato burocrático y los límites de la burguesía técnica»",
+            "focus": "Plantea que la burocracia imperial impidió deliberadamente el desarrollo de una clase empresarial autónoma.",
+            "link": "https://yalebooks.yale.edu/book/9780300010701",
+            "link_type": "Editorial / Catálogo"
+          }
+        ]
+      },
+      {
+        "id": "e2_4",
+        "year_display": "1870",
+        "year_val": 1870,
+        "title": "Masacre de Tianjin",
+        "stage_pos": "Cresta geométrica (1870)",
+        "desc": "Masacre de Tianjin, violentos disturbios populares contra misioneros católicos e instituciones extranjeras que evidenciaron la tensa fricción sociocultural latente.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=Tianjin+Massacre+1870",
+        "img_illus_title": "Masacre de Tianjin",
+        "img_map": "https://tse1.mm.bing.net/th?q=Tianjin+location+map+China",
+        "img_map_title": "Mapa Tianjin China",
+        "map_focus": "Puerto marítimo y fluvial de Tianjin",
+        "wiki": "https://en.wikipedia.org/wiki/Tianjin_Massacre",
+        "wiki_label": "Wikipedia: Tianjin Massacre (en)",
+        "sinological_sources": [
+          {
+            "author": "Jonathan Spence",
+            "work": "The Search for Modern China",
+            "chapters": "Cap. 9: «Alienating the Powers: The Tianjin Massacre of 1870»",
+            "focus": "Explora la histeria colectiva en torno a los orfanatos franceses y el peligro de una nueva intervención militar masiva de las potencias.",
+            "link": "https://wwnorton.com/books/The-Search-for-Modern-China/",
+            "link_type": "Editorial / Catálogo"
+          }
+        ]
+      },
+      {
+        "id": "e2_5",
+        "year_display": "1884-1885",
+        "year_val": 1884.5,
+        "title": "Guerra Sino-Francesa",
+        "stage_pos": "Fase descendente hacia el valle de 1890",
+        "desc": "Guerra Sino-Francesa, que concluyó con la pérdida de la soberanía tradicional Qing sobre el norte de Vietnam (Tonkín) tras la destrucción naval de los astilleros imperiales.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=Sino-French+War+battle",
+        "img_illus_title": "Guerra Sino-Francesa",
+        "img_map": "https://tse1.mm.bing.net/th?q=Sino-French+War+map+Tonkin",
+        "img_map_title": "Mapa Guerra Sino Francesa Vietnam",
+        "map_focus": "Frontera con Vietnam (Tonkín) y Fuzhou",
+        "wiki": "https://es.wikipedia.org/wiki/Guerra_sino-francesa",
+        "wiki_label": "Wikipedia: Guerra Sino-Francesa",
+        "sinological_sources": [
+          {
+            "author": "Jonathan Spence",
+            "work": "The Search for Modern China",
+            "chapters": "Cap. 9: «The Shattered Tributary Sphere: The Tonkin Campaign and the Battle of Fuzhou»",
+            "focus": "Narra el descalabro naval de la flota de Fujian y la pérdida definitiva del protectorado tributario en Indochina.",
+            "link": "https://wwnorton.com/books/The-Search-for-Modern-China/",
+            "link_type": "Editorial / Catálogo"
+          }
+        ]
+      },
+      {
+        "id": "e2_6",
+        "year_display": "1889",
+        "year_val": 1889,
+        "title": "El emperador Guangxu asume el poder formal",
+        "stage_pos": "Llegada al valle de 1890",
+        "desc": "El emperador Guangxu asume el poder formalmente frente a un Japón moderno en acelerada industrialización, preludio de la crisis terminal de finales de siglo.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=Emperor+Guangxu+Qing",
+        "img_illus_title": "Emperador Guangxu",
+        "img_map": "https://tse1.mm.bing.net/th?q=Qing+Dynasty+map+1890",
+        "img_map_title": "Mapa Imperio Qing 1890",
+        "map_focus": "China y cerco imperialista regional",
+        "wiki": "https://es.wikipedia.org/wiki/Guangxu",
+        "wiki_label": "Wikipedia: Emperador Guangxu",
+        "sinological_sources": [
+          {
+            "author": "Ray Huang",
+            "work": "China: A Macro History",
+            "chapters": "Cap. 18: «The Guangxu Reign: Between Palace Factions and Modern Imperialism»",
+            "focus": "Retrata la trampa política en la que el joven emperador quedó atrapado entre la tutela de Cixi y los desafíos de Japón.",
+            "link": "https://www.routledge.com/China-A-Macro-History/Huang/p/book/9781563247316",
+            "link_type": "Editorial / Catálogo"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 3,
+    "name": "3. Fin del Imperio y Periodo Republicano",
+    "wave": "Onda 3: Valle (1890) ➔ Cresta (1914) ➔ Valle (1940)",
+    "start_year": 1890,
+    "crest_year": 1914,
+    "end_year": 1940,
+    "western": {
+      "title": "Ciclo de las Guerras Mundiales (I & II)",
+      "desc": "Ciclo de las Guerras Mundiales. La cresta de 1914 marca el estallido de la Primera Guerra Mundial, el valle de 1940 se ubica en los inicios de la Segunda Guerra Mundial.",
+      "img": "https://tse1.mm.bing.net/th?q=World+War+I+trenches",
+      "img_label": "Primera Guerra Mundial Trincheras",
+      "centro": "EE.UU. y Alemania",
+      "wiki": "https://es.wikipedia.org/wiki/Primera_Guerra_Mundial",
+      "wiki_label": "Wikipedia: Primera Guerra Mundial"
+    },
+    "authors": [
+      {
+        "author": "Joseph R. Levenson",
+        "text": "Analiza la Reforma (1898) y el 4 de Mayo (1919). Concluye que la intelectualidad rompió con Confucio; la tradición fue 'museificada' para salvar a la nación.",
+        "unal_url": "https://bibliotecasunal.primo.exlibrisgroup.com/nde/search?vid=57UNDC_INST:57UNDC_INST_V1&tab=LibraryCatalog&search_scope=MyInstitution&lang=es&query=Joseph%20R.%20Levenson",
+        "google_url": "https://www.google.com/search?q=Joseph%20R.%20Levenson+sin%C3%B3logo+autor"
+      },
+      {
+        "author": "Qian Mu",
+        "text": "Reacciona contra el 4 de Mayo. Argumenta que el desprecio por la historia (1911-1919) destruyó la cohesión nacional frente a Japón (1937).",
+        "unal_url": "https://bibliotecasunal.primo.exlibrisgroup.com/nde/search?vid=57UNDC_INST:57UNDC_INST_V1&tab=LibraryCatalog&search_scope=MyInstitution&lang=es&query=Qian%20Mu",
+        "google_url": "https://www.google.com/search?q=Qian%20Mu+sin%C3%B3logo+autor"
+      },
+      {
+        "author": "Fei Xiaotong",
+        "text": "Documenta la asfixia del campesinado en los años 30. Muestra cómo la economía rural colapsaba bajo la guerra inminente.",
+        "unal_url": "https://bibliotecasunal.primo.exlibrisgroup.com/nde/search?vid=57UNDC_INST:57UNDC_INST_V1&tab=LibraryCatalog&search_scope=MyInstitution&lang=es&query=Fei%20Xiaotong",
+        "google_url": "https://www.google.com/search?q=Fei%20Xiaotong+sin%C3%B3logo+autor"
+      }
+    ],
+    "events": [
+      {
+        "id": "e3_1",
+        "year_display": "1894-1895",
+        "year_val": 1894.5,
+        "title": "Primera Guerra Sino-Japonesa y Pérdida de Taiwán",
+        "stage_pos": "Inicio de la onda hacia 1914",
+        "desc": "Primera Guerra Sino-Japonesa y pérdida de Taiwán tras la firma del Tratado de Shimonoseki, demostrando la superioridad militar japonesa tras la Restauración Meiji.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=First+Sino-Japanese+War+naval+battle",
+        "img_illus_title": "Primera Guerra Sino-Japonesa",
+        "img_map": "https://tse1.mm.bing.net/th?q=Treaty+of+Shimonoseki+map+Taiwan",
+        "img_map_title": "Mapa Tratado de Shimonoseki Taiwan",
+        "map_focus": "Mar Amarillo, Taiwán y Corea",
+        "wiki": "https://es.wikipedia.org/wiki/Primera_guerra_sino-japonesa",
+        "wiki_label": "Wikipedia: Guerra Sino-Japonesa",
+        "sinological_sources": [
+          {
+            "author": "Jonathan Spence",
+            "work": "The Search for Modern China",
+            "chapters": "Cap. 10: «Disaster in the East: The Sino-Japanese War and the Loss of Taiwan»",
+            "focus": "Analiza el choque psicológico de ser derrotados por un país asiático considerado tradicionalmente como 'bárbaro del este'.",
+            "link": "https://wwnorton.com/books/The-Search-for-Modern-China/",
+            "link_type": "Editorial / Catálogo"
+          }
+        ]
+      },
+      {
+        "id": "e3_2",
+        "year_display": "1898",
+        "year_val": 1898,
+        "title": "Reforma de los Cien Días",
+        "stage_pos": "Fase ascendente de la onda",
+        "desc": "Reforma de los Cien Días de Kang Youwei y Liang Qichao para refundar la institucionalidad estatal, aplastada por el golpe de Estado de la emperatriz viuda Cixi.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=Hundred+Days+Reform+China+1898",
+        "img_illus_title": "Reforma de los Cien Días",
+        "img_map": "https://tse1.mm.bing.net/th?q=Forbidden+City+Beijing+map",
+        "img_map_title": "Mapa Pekín Ciudad Prohibida",
+        "map_focus": "Ciudad Prohibida y corte imperial de Pekín",
+        "wiki": "https://es.wikipedia.org/wiki/Reforma_de_los_Cien_D%C3%ADas",
+        "wiki_label": "Wikipedia: Reforma Cien Días",
+        "sinological_sources": [
+          {
+            "author": "Joseph R. Levenson",
+            "work": "Confucian China and Its Modern Fate: A Trilogy",
+            "chapters": "Vol. 1, Cap. 4: «The Intellectual Challenge of Reform»",
+            "focus": "Demuestra la paradoja de intentar salvar el imperio secularizando y 'museificando' a Confucio mediante reformas institucionales radicales.",
+            "link": "https://www.ucpress.edu/book/9780520007437/confucian-china-and-its-modern-fate",
+            "link_type": "Editorial / Catálogo"
+          }
+        ]
+      },
+      {
+        "id": "e3_3",
+        "year_display": "1899-1901",
+        "year_val": 1900,
+        "title": "Levantamiento de los Bóxers y Ocupación de Pekín",
+        "stage_pos": "Fase ascendente hacia 1914",
+        "desc": "Levantamiento de los Bóxers y ocupación de Pekín por la Alianza de las Ocho Naciones, culminando con la imposición del Protocolo Bóxer y tropas extranjeras permanentes.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=Boxer+Rebellion+China",
+        "img_illus_title": "Rebelión Bóxer",
+        "img_map": "https://tse1.mm.bing.net/th?q=Eight-Nation+Alliance+map+Beijing+campaign",
+        "img_map_title": "Mapa Alianza Ocho Naciones Pekín",
+        "map_focus": "Avance de la Alianza hacia el Barrio de las Legaciones",
+        "wiki": "https://es.wikipedia.org/wiki/Levantamiento_de_los_b%C3%B3xers",
+        "wiki_label": "Wikipedia: Levantamiento Bóxers",
+        "sinological_sources": [
+          {
+            "author": "Jonathan Spence",
+            "work": "The Search for Modern China",
+            "chapters": "Cap. 11: «The Righteous and Harmonious Fists: Siege and Fall of Beijing»",
+            "focus": "Desarrolla el origen popular de las artes marciales milenaristas contra la penetración ferroviaria y religiosa extranjera.",
+            "link": "https://wwnorton.com/books/The-Search-for-Modern-China/",
+            "link_type": "Editorial / Catálogo"
+          }
+        ]
+      },
+      {
+        "id": "e3_4",
+        "year_display": "1911-1912",
+        "year_val": 1911.5,
+        "title": "Revolución de Xinhai y Caída Qing",
+        "stage_pos": "Aproximación a la cresta de 1914",
+        "desc": "Revolución de Xinhai, caída de la dinastía Qing y fundación de la República de China con Sun Yat-sen, clausurando dos milenios de régimen monárquico imperial.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=Xinhai+Revolution+Wuchang+Uprising",
+        "img_illus_title": "Revolución Xinhai",
+        "img_map": "https://tse1.mm.bing.net/th?q=Wuchang+Uprising+map+China",
+        "img_map_title": "Mapa Levantamiento Wuchang",
+        "map_focus": "Wuchang (Wuhan) y provincias sublevadas",
+        "wiki": "https://es.wikipedia.org/wiki/Revoluci%C3%B3n_de_Xinhai",
+        "wiki_label": "Wikipedia: Revolución de Xinhai",
+        "sinological_sources": [
+          {
+            "author": "Qian Mu",
+            "work": "Guoshi Dagang (Esbozo de la historia nacional de China, 1940)",
+            "chapters": "Cap. 46: «El colapso de la monarquía dinástica y la crisis de la cohesión republicana»",
+            "focus": "Subraya que la caída de la dinastía dejó un vacío de legitimidad moral e histórica que ninguna institución importada pudo suplir de inmediato.",
+            "link": "https://www.worldcat.org/title/guo-shi-da-gang/oclc/29841804",
+            "link_type": "Ficha bibliográfica (WorldCat)"
+          }
+        ]
+      },
+      {
+        "id": "e3_5",
+        "year_display": "1914",
+        "year_val": 1914,
+        "title": "Yuan Shikai y la Era de los Señores de la Guerra",
+        "stage_pos": "Cresta geométrica (1914)",
+        "desc": "Yuan Shikai centraliza el poder autocrático preparando el terreno a la fragmentación territorial y el caos militar de la Era de los Señores de la Guerra.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=Yuan+Shikai+general",
+        "img_illus_title": "Yuan Shikai",
+        "img_map": "https://tse1.mm.bing.net/th?q=Warlord+Era+China+map+1916",
+        "img_map_title": "Mapa Señores de la Guerra China",
+        "map_focus": "Feudos y camarillas militares provinciales",
+        "wiki": "https://es.wikipedia.org/wiki/Yuan_Shikai",
+        "wiki_label": "Wikipedia: Yuan Shikai",
+        "sinological_sources": [
+          {
+            "author": "Jonathan Spence",
+            "work": "The Search for Modern China",
+            "chapters": "Cap. 12: «The New Republic and Yuan Shikai’s Dictatorship»",
+            "focus": "Estudia el intento de restauración monárquica de 1915-1916 y el posterior fraccionamiento de los ejércitos regionales del norte.",
+            "link": "https://wwnorton.com/books/The-Search-for-Modern-China/",
+            "link_type": "Editorial / Catálogo"
+          }
+        ]
+      },
+      {
+        "id": "e3_6",
+        "year_display": "1919",
+        "year_val": 1919,
+        "title": "Movimiento del 4 de Mayo",
+        "stage_pos": "Fase descendente hacia 1940",
+        "desc": "Movimiento del 4 de Mayo; masivas protestas estudiantiles contra las cesiones del Tratado de Versalles a Japón, impulsando una profunda renovación cultural.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=May+Fourth+Movement+protest",
+        "img_illus_title": "Movimiento 4 de Mayo",
+        "img_map": "https://tse1.mm.bing.net/th?q=May+Fourth+Movement+Peking+University+map",
+        "img_map_title": "Mapa Movimiento 4 de Mayo Beijing",
+        "map_focus": "Universidad de Pekín y Puerta de Tiananmen",
+        "wiki": "https://es.wikipedia.org/wiki/Movimiento_del_Cuatro_de_Mayo",
+        "wiki_label": "Wikipedia: Movimiento 4 de Mayo",
+        "sinological_sources": [
+          {
+            "author": "Joseph R. Levenson",
+            "work": "Confucian China and Its Modern Fate: A Trilogy",
+            "chapters": "Vol. 3, Cap. 2: «The Problem of Historical Significance: The May Fourth Break»",
+            "focus": "Define el movimiento como la ruptura epistemológica definitiva donde la intelectualidad sacrificó la tradición para salvar la nación.",
+            "link": "https://www.ucpress.edu/book/9780520007437/confucian-china-and-its-modern-fate",
+            "link_type": "Editorial / Catálogo"
+          },
+          {
+            "author": "Qian Mu",
+            "work": "Guoshi Dagang",
+            "chapters": "Epílogo: «La Nueva Cultura y la pérdida de la confianza histórica»",
+            "focus": "Critica duramente la iconoclasia de la época por haber desarmado espiritualmente al pueblo chino al desacreditar sus valores tradicionales.",
+            "link": "https://www.worldcat.org/title/guo-shi-da-gang/oclc/29841804",
+            "link_type": "Ficha bibliográfica (WorldCat)"
+          }
+        ]
+      },
+      {
+        "id": "e3_7",
+        "year_display": "1927",
+        "year_val": 1927,
+        "title": "Masacre de Shanghái",
+        "stage_pos": "Fase descendente hacia 1940",
+        "desc": "Masacre de Shanghái perpetrada por Chiang Kai-shek contra comunistas y sindicatos obreros, desatando la primera etapa de la guerra civil china.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=Shanghai+Massacre+1927",
+        "img_illus_title": "Masacre de Shanghái",
+        "img_map": "https://tse1.mm.bing.net/th?q=Shanghai+map+1927",
+        "img_map_title": "Mapa Masacre de Shanghái",
+        "map_focus": "Concesión Internacional y Barrio Chino de Shanghái",
+        "wiki": "https://es.wikipedia.org/wiki/Matanza_de_Shangh%C3%A1i_de_1927",
+        "wiki_label": "Wikipedia: Matanza de Shanghái",
+        "sinological_sources": [
+          {
+            "author": "Fei Xiaotong",
+            "work": "From the Soil: The Foundations of Chinese Society (Xiangtu Zhongguo)",
+            "chapters": "Cap. 6: «The Differential Association and the Division of City and Country»",
+            "focus": "Aborda la fractura estructural irreconciliable entre la élite mercantil urbanizada de las concesiones y el campesinado tradicional.",
+            "link": "https://www.ucpress.edu/book/9780520077966/from-the-soil",
+            "link_type": "Editorial / Catálogo"
+          }
+        ]
+      },
+      {
+        "id": "e3_8",
+        "year_display": "1934-1935",
+        "year_val": 1934.5,
+        "title": "La Larga Marcha",
+        "stage_pos": "Fase descendente hacia el valle de 1940",
+        "desc": "La Larga Marcha de los comunistas a través de miles de kilómetros de territorio agreste, afianzando la autoridad y doctrina campesina de Mao Zedong.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=The+Long+March+China+Mao",
+        "img_illus_title": "Larga Marcha",
+        "img_map": "https://tse1.mm.bing.net/th?q=Long+March+route+map+China",
+        "img_map_title": "Mapa Ruta Larga Marcha",
+        "map_focus": "Ruta de Jiangxi a Yan'an a través del interior",
+        "wiki": "https://es.wikipedia.org/wiki/Larga_Marcha",
+        "wiki_label": "Wikipedia: La Larga Marcha",
+        "sinological_sources": [
+          {
+            "author": "Fei Xiaotong",
+            "work": "Peasant Life in China: A Field Study of Country Life in the Yangtze Valley",
+            "chapters": "Cap. 15: «Agrarian Crisis and the Collapse of Rural Livelihood»",
+            "focus": "Documenta la pobreza extrema del campo que transformó las bases campesinas del sur y oeste en el caldo de cultivo del Ejército Rojo.",
+            "link": "https://www.routledge.com/Peasant-Life-in-China-A-Field-Study-of-Country-Life-in-the-Yangtze-Valley/Xiaotong/p/book/9780415862219",
+            "link_type": "Editorial / Catálogo"
+          }
+        ]
+      },
+      {
+        "id": "e3_9",
+        "year_display": "1937",
+        "year_val": 1937,
+        "title": "Incidente del Puente de Marco Polo y Masacre de Nankín",
+        "stage_pos": "Llegada al valle de 1940",
+        "desc": "Incidente del Puente de Marco Polo y Masacre de Nankín, marcando el estallido de la invasión militar japonesa a escala total y guerra de resistencia.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=Marco+Polo+Bridge+Incident+1937",
+        "img_illus_title": "Masacre de Nankín",
+        "img_map": "https://tse1.mm.bing.net/th?q=Japanese+invasion+of+China+map+1937",
+        "img_map_title": "Mapa Invasión Japonesa China 1937",
+        "map_focus": "Pekín, Nankín y frente oriental de invasión",
+        "wiki": "https://es.wikipedia.org/wiki/Incidente_del_Puente_de_Marco_Polo",
+        "wiki_label": "Wikipedia: Puente Marco Polo",
+        "sinological_sources": [
+          {
+            "author": "Qian Mu",
+            "work": "Guoshi Dagang (Redactado durante la resistencia en el exilio, 1937–1940)",
+            "chapters": "Prólogo general: «Sobre el patriotismo y el destino de la nación en tiempos de invasión»",
+            "focus": "Texto redactado en el exilio interior para mantener viva la memoria y moral del país ante los horrores bélicos en Nankín y la costa.",
+            "link": "https://www.worldcat.org/title/guo-shi-da-gang/oclc/29841804",
+            "link_type": "Ficha bibliográfica (WorldCat)"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 4,
+    "name": "4. Maoísmo, Guerra Fría y Apertura",
+    "wave": "Onda 4: Valle (1940) ➔ Cresta (1967) ➔ Valle (1990)",
+    "start_year": 1940,
+    "crest_year": 1967,
+    "end_year": 1990,
+    "western": {
+      "title": "Guerra Fría, Carrera Espacial y Caída del Muro de Berlín",
+      "desc": "Guerra Fría y Carrera Espacial. La cresta de 1967 precede la llegada a la Luna. El valle de 1990 coincide con la Caída del Muro de Berlín (1989).",
+      "img": "https://tse1.mm.bing.net/th?q=Fall+of+the+Berlin+Wall+1989",
+      "img_label": "Caída Muro de Berlín",
+      "centro": "EE.UU., ¿URSS?",
+      "wiki": "https://es.wikipedia.org/wiki/Guerra_Fr%C3%ADa",
+      "wiki_label": "Wikipedia: Guerra Fría"
+    },
+    "authors": [
+      {
+        "author": "Benjamin I. Schwartz",
+        "text": "Demuestra que el maoísmo (1942-1949) fue una herejía marxista; Mao utilizó doctrina campesina y no obrera para alcanzar el poder.",
+        "unal_url": "https://bibliotecasunal.primo.exlibrisgroup.com/nde/search?vid=57UNDC_INST:57UNDC_INST_V1&tab=LibraryCatalog&search_scope=MyInstitution&lang=es&query=Benjamin%20I.%20Schwartz",
+        "google_url": "https://www.google.com/search?q=Benjamin%20I.%20Schwartz+sin%C3%B3logo+autor"
+      },
+      {
+        "author": "Simon Leys",
+        "text": "En plena cresta (1967), denunció que la Revolución Cultural no era utopía igualitaria, sino una brutal purga política orquestada por Mao.",
+        "unal_url": "https://bibliotecasunal.primo.exlibrisgroup.com/nde/search?vid=57UNDC_INST:57UNDC_INST_V1&tab=LibraryCatalog&search_scope=MyInstitution&lang=es&query=Simon%20Leys",
+        "google_url": "https://www.google.com/search?q=Simon%20Leys+sin%C3%B3logo+autor"
+      },
+      {
+        "author": "Flora Botton Beja",
+        "text": "Enmarca la entrada a la ONU (1971) como un acto de supervivencia y soberanía de un país del Tercer Mundo en la Guerra Fría.",
+        "unal_url": "https://bibliotecasunal.primo.exlibrisgroup.com/nde/search?vid=57UNDC_INST:57UNDC_INST_V1&tab=LibraryCatalog&search_scope=MyInstitution&lang=es&query=Flora%20Botton%20Beja",
+        "google_url": "https://www.google.com/search?q=Flora%20Botton%20Beja+sin%C3%B3logo+autor"
+      }
+    ],
+    "events": [
+      {
+        "id": "e4_1",
+        "year_display": "1942",
+        "year_val": 1942,
+        "title": "Movimiento de Rectificación de Yan'an",
+        "stage_pos": "Inicio de la onda hacia la cresta de 1967",
+        "desc": "Movimiento de Rectificación de Yan'an (ideología de Mao), disciplinando los cuadros y estableciendo el maoísmo como ortodoxia indiscutida del partido.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=Yanan+Rectification+Movement+Mao",
+        "img_illus_title": "Movimiento Yan'an",
+        "img_map": "https://tse1.mm.bing.net/th?q=Yanan+Shaanxi+map+location",
+        "img_map_title": "Mapa Yan'an Shaanxi",
+        "map_focus": "Base revolucionaria de Yan'an, Shaanxi",
+        "wiki": "https://es.wikipedia.org/wiki/Movimiento_de_Rectificaci%C3%B3n_de_Yan%27an",
+        "wiki_label": "Wikipedia: Rectificación Yan'an",
+        "sinological_sources": [
+          {
+            "author": "Benjamin I. Schwartz",
+            "work": "Chinese Communism and the Rise of Mao",
+            "chapters": "Caps. 9 y 10: «The Yan'an Legacy» y «The Sinification of Marxism»",
+            "focus": "Describe la campaña de Yan'an como el momento clave de 'sinización' del marxismo, sustituyendo el proletariado urbano por el campesinado.",
+            "link": "https://www.hup.harvard.edu/books/9780674122512",
+            "link_type": "Editorial / Catálogo"
+          }
+        ]
+      },
+      {
+        "id": "e4_2",
+        "year_display": "1949",
+        "year_val": 1949,
+        "title": "Fundación de la República Popular China",
+        "stage_pos": "Fase ascendente de la onda",
+        "desc": "Fundación de la República Popular China proclamada por Mao Zedong el 1 de octubre en la Plaza de Tiananmen, tras la retirada nacionalista a Taiwán.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=Mao+Zedong+founding+PRC+1949",
+        "img_illus_title": "Fundación RPC 1949",
+        "img_map": "https://tse1.mm.bing.net/th?q=China+Taiwan+map+1949",
+        "img_map_title": "Mapa RPC y Taiwán 1949",
+        "map_focus": "China continental y repliegue en Taiwán",
+        "wiki": "https://es.wikipedia.org/wiki/Proclamaci%C3%B3n_de_la_Rep%C3%BAblica_Popular_China",
+        "wiki_label": "Wikipedia: Proclamación RPC 1949",
+        "sinological_sources": [
+          {
+            "author": "Benjamin I. Schwartz",
+            "work": "Chinese Communism and the Rise of Mao",
+            "chapters": "Cap. 13: «The Triumph of the Peasant Strategy and the Founding of the PRC»",
+            "focus": "Sintetiza la consagración de la herejía maoísta como modelo victorioso de revolución estatal en el mundo poscolonial.",
+            "link": "https://www.hup.harvard.edu/books/9780674122512",
+            "link_type": "Editorial / Catálogo"
+          }
+        ]
+      },
+      {
+        "id": "e4_3",
+        "year_display": "1950-1953",
+        "year_val": 1951.5,
+        "title": "Intervención en la Guerra de Corea",
+        "stage_pos": "Fase ascendente de la onda",
+        "desc": "Intervención militar en la Guerra de Corea mediante el Ejército de Voluntarios del Pueblo Chino cruzando el río Yalu para frenar el avance occidental.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=Chinese+People+Volunteer+Army+Korea",
+        "img_illus_title": "Voluntarios Chinos Guerra Corea",
+        "img_map": "https://tse1.mm.bing.net/th?q=Korean+War+Yalu+River+map",
+        "img_map_title": "Mapa Guerra de Corea rio Yalu",
+        "map_focus": "Río Yalu y línea de alto el fuego en Corea",
+        "wiki": "https://es.wikipedia.org/wiki/Guerra_de_Corea",
+        "wiki_label": "Wikipedia: Guerra de Corea",
+        "sinological_sources": [
+          {
+            "author": "Flora Botton Beja",
+            "work": "China: Su historia y cultura hasta el siglo XXI",
+            "chapters": "Cap. 18: «La construcción del nuevo Estado y la intervención en Corea»",
+            "focus": "Explica la intervención militar china en el río Yalu como una necesidad defensiva perentoria de frontera frente a Washington.",
+            "link": "https://libros.colmex.mx/tienda/china-su-historia-y-cultura-hasta-el-siglo-xxi/",
+            "link_type": "Editorial (El Colegio de México)"
+          }
+        ]
+      },
+      {
+        "id": "e4_4",
+        "year_display": "1958-1962",
+        "year_val": 1960,
+        "title": "El Gran Salto Adelante",
+        "stage_pos": "Aproximación a la cresta de 1967",
+        "desc": "El Gran Salto Adelante y la instauración forzada de comunas populares rurales, que desembocó en desorganización productiva y la Gran Hambruna.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=Great+Leap+Forward+propaganda+poster",
+        "img_illus_title": "Gran Salto Adelante Propaganda",
+        "img_map": "https://tse1.mm.bing.net/th?q=People+communes+map+China+1958",
+        "img_map_title": "Mapa Comunas Populares China",
+        "map_focus": "Colectivización agrícola en las llanuras centrales",
+        "wiki": "https://es.wikipedia.org/wiki/Gran_Salto_Adelante",
+        "wiki_label": "Wikipedia: Gran Salto Adelante",
+        "sinological_sources": [
+          {
+            "author": "Flora Botton Beja",
+            "work": "China: Su historia y cultura hasta el siglo XXI",
+            "chapters": "Cap. 19: «El Gran Salto Adelante y la catástrofe de las comunas populares»",
+            "focus": "Analiza la desorganización de los planes agrícolas provocada por el voluntarismo político acelerado y sus costos humanos masivos.",
+            "link": "https://libros.colmex.mx/tienda/china-su-historia-y-cultura-hasta-el-siglo-xxi/",
+            "link_type": "Editorial (El Colegio de México)"
+          }
+        ]
+      },
+      {
+        "id": "e4_5",
+        "year_display": "1966-1976",
+        "year_val": 1967,
+        "title": "La Revolución Cultural",
+        "stage_pos": "Cresta geométrica (1967)",
+        "desc": "La Revolución Cultural impulsada por Mao y liderada en las calles por los Guardias Rojos, sumiendo las instituciones y la cultura en una década de agitación.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=Red+Guards+Cultural+Revolution+China",
+        "img_illus_title": "Guardias Rojos Revolución Cultural",
+        "img_map": "https://tse1.mm.bing.net/th?q=Cultural+Revolution+Beijing+map",
+        "img_map_title": "Mapa Centros Revolución Cultural Beijing",
+        "map_focus": "Focos urbanos en Pekín y grandes ciudades",
+        "wiki": "https://es.wikipedia.org/wiki/Revoluci%C3%B3n_Cultural",
+        "wiki_label": "Wikipedia: Revolución Cultural",
+        "sinological_sources": [
+          {
+            "author": "Simon Leys",
+            "work": "Los trajes nuevos del presidente Mao (1971)",
+            "chapters": "Caps. 1 a 4: Crónica política de 1967 y «El desmantelamiento del Partido»",
+            "focus": "Denuncia audaz y pionera en Occidente demostrando que la Revolución Cultural fue una sangrienta purga facciosa y no un renacimiento utópico.",
+            "link": "https://www.worldcat.org/title/habits-neufs-du-president-mao-chronique-de-la-revolution-culturelle/oclc/459468",
+            "link_type": "Ficha bibliográfica (WorldCat)"
+          },
+          {
+            "author": "Simon Leys",
+            "work": "Sombras chinescas (Ombres chinoises, 1974)",
+            "chapters": "Cap. 2: «Monumentos en ruinas» y Cap. 5: «La vida de los cuadros»",
+            "focus": "Crónica de primera mano sobre la devastación del patrimonio histórico y el terror cultural en las calles de Pekín.",
+            "link": "https://www.worldcat.org/title/ombres-chinoises/oclc/1273874",
+            "link_type": "Ficha bibliográfica (WorldCat)"
+          }
+        ]
+      },
+      {
+        "id": "e4_6",
+        "year_display": "1971",
+        "year_val": 1971,
+        "title": "La RPC asume el asiento en la ONU",
+        "stage_pos": "Fase descendente hacia 1990",
+        "desc": "La República Popular China asume el asiento representativo en la Organización de las Naciones Unidas mediante la histórica Resolución 2758.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=China+UN+General+Assembly+1971",
+        "img_illus_title": "China ONU 1971",
+        "img_map": "https://tse1.mm.bing.net/th?q=UN+Resolution+2758+voting+map",
+        "img_map_title": "Mapa Países Reconocimiento RPC 1971",
+        "map_focus": "Reconocimiento diplomático en la arena global",
+        "wiki": "https://es.wikipedia.org/wiki/Resoluci%C3%B3n_2758_de_la_Asamblea_General_de_las_Naciones_Unidas",
+        "wiki_label": "Wikipedia: Resolución 2758 ONU",
+        "sinological_sources": [
+          {
+            "author": "Flora Botton Beja",
+            "work": "Historia de las relaciones internacionales de China",
+            "chapters": "Cap.: «La batalla diplomática por el reconocimiento internacional y la Resolución 2758»",
+            "focus": "Muestra el triunfo diplomático de la RPC al consolidar el apoyo de los países no alineados y del Tercer Mundo frente a la Guerra Fría.",
+            "link": "https://libros.colmex.mx/tienda/china-su-historia-y-cultura-hasta-el-siglo-xxi/",
+            "link_type": "Editorial (El Colegio de México)"
+          }
+        ]
+      },
+      {
+        "id": "e4_7",
+        "year_display": "1978",
+        "year_val": 1978,
+        "title": "Reformas de Deng Xiaoping",
+        "stage_pos": "Fase descendente hacia 1990",
+        "desc": "Reformas de Deng Xiaoping y lanzamiento de la política de Reforma y Apertura económica con la fundación de Zonas Económicas Especiales.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=Deng+Xiaoping+economic+reform",
+        "img_illus_title": "Deng Xiaoping 1978",
+        "img_map": "https://tse1.mm.bing.net/th?q=Special+Economic+Zones+China+map+Shenzhen",
+        "img_map_title": "Mapa Zonas Económicas Especiales China",
+        "map_focus": "Shenzhen, Zhuhai, Shantou y Xiamen",
+        "wiki": "https://es.wikipedia.org/wiki/Reforma_econ%C3%B3mica_china",
+        "wiki_label": "Wikipedia: Reforma y Apertura",
+        "sinological_sources": [
+          {
+            "author": "Flora Botton Beja",
+            "work": "China: Su historia y cultura hasta el siglo XXI",
+            "chapters": "Cap. 21: «El Tercer Pleno de 1978 y el rumbo de la Reforma y Apertura»",
+            "focus": "Examina la transición pragmática del maoísmo doctrinario hacia el pragmatismo económico y la apertura hacia el capital foráneo.",
+            "link": "https://libros.colmex.mx/tienda/china-su-historia-y-cultura-hasta-el-siglo-xxi/",
+            "link_type": "Editorial (El Colegio de México)"
+          }
+        ]
+      },
+      {
+        "id": "e4_8",
+        "year_display": "1989",
+        "year_val": 1989,
+        "title": "Protestas de Tiananmén",
+        "stage_pos": "Llegada al valle de 1990",
+        "desc": "Protestas prodemocráticas de la Plaza de Tiananmén en Pekín, reprimidas militarmente en junio de 1989 ante la mirada internacional.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=Tiananmen+Square+protests+1989",
+        "img_illus_title": "Protestas Tiananmen",
+        "img_map": "https://tse1.mm.bing.net/th?q=Tiananmen+Square+Beijing+map",
+        "img_map_title": "Mapa Plaza Tiananmen Beijing",
+        "map_focus": "Plaza Tiananmen y arterias centrales de Pekín",
+        "wiki": "https://es.wikipedia.org/wiki/Protestas_de_la_plaza_de_Tiananm%C3%A9n_de_1989",
+        "wiki_label": "Wikipedia: Plaza Tiananmén 1989",
+        "sinological_sources": [
+          {
+            "author": "Simon Leys",
+            "work": "La risa protectora: Ensayos sobre China",
+            "chapters": "Ensayo: «Tiananmen después de la tormenta: La masacre de la esperanza»",
+            "focus": "Reflexión moral sobre la intolerancia dictatorial del régimen del PCCh frente a los reclamos civiles y estudiantiles de primavera.",
+            "link": "https://www.google.com/search?q=Simon+Leys+Tiananmen+Square+essays",
+            "link_type": "Búsqueda en Google"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 5,
+    "name": "5. El Siglo XXI y el Orden Multipolar",
+    "wave": "Onda 5: Valle (1990) ➔ Cresta (2008) ➔ Valle (2030)",
+    "start_year": 1990,
+    "crest_year": 2008,
+    "end_year": 2030,
+    "western": {
+      "title": "Revolución Digital, Crisis de 2008 & Transición de la IA",
+      "desc": "Revolución Digital y Crisis 2008. La cresta de 2008 coincide con la caída de Lehman Brothers. El valle de 2030 se enmarca en la IA y reestructuración global.",
+      "img": "https://tse1.mm.bing.net/th?q=2008+financial+crisis+Wall+Street",
+      "img_label": "Crisis Financiera 2008 Wall Street",
+      "centro": "EE.UU.",
+      "wiki": "https://es.wikipedia.org/wiki/Crisis_financiera_de_2008",
+      "wiki_label": "Wikipedia: Crisis de 2008"
+    },
+    "authors": [
+      {
+        "author": "Ray Huang",
+        "text": "Tras la entrada a la OMC (2001) y 2008, argumentaría que China alcanzó la 'gestión numérica' eficiente que los Ming no tuvieron.",
+        "unal_url": "https://bibliotecasunal.primo.exlibrisgroup.com/nde/search?vid=57UNDC_INST:57UNDC_INST_V1&tab=LibraryCatalog&search_scope=MyInstitution&lang=es&query=Ray%20Huang",
+        "google_url": "https://www.google.com/search?q=Ray%20Huang+sin%C3%B3logo+autor"
+      },
+      {
+        "author": "Mizoguchi Yūzō",
+        "text": "Frente a la Nueva Ruta de la Seda (2013), exige entender a China según su propia lógica histórica ('China como método') y no midiendo cuándo será una democracia liberal.",
+        "unal_url": "https://bibliotecasunal.primo.exlibrisgroup.com/nde/search?vid=57UNDC_INST:57UNDC_INST_V1&tab=LibraryCatalog&search_scope=MyInstitution&lang=es&query=Mizoguchi%20Y%C5%ABz%C5%8D",
+        "google_url": "https://www.google.com/search?q=Mizoguchi%20Y%C5%ABz%C5%8D+sin%C3%B3logo+autor"
+      },
+      {
+        "author": "Flora Botton Beja",
+        "text": "Destaca cómo la maduración tecnológica ofrece al Sur Global una vía de modernización alterna al fin de la hegemonía occidental (1844-2026).",
+        "unal_url": "https://bibliotecasunal.primo.exlibrisgroup.com/nde/search?vid=57UNDC_INST:57UNDC_INST_V1&tab=LibraryCatalog&search_scope=MyInstitution&lang=es&query=Flora%20Botton%20Beja",
+        "google_url": "https://www.google.com/search?q=Flora%20Botton%20Beja+sin%C3%B3logo+autor"
+      }
+    ],
+    "events": [
+      {
+        "id": "e5_1",
+        "year_display": "1992",
+        "year_val": 1992,
+        "title": "Gira por el Sur de Deng Xiaoping",
+        "stage_pos": "Inicio de la onda hacia la cresta de 2008",
+        "desc": "Gira por el Sur de Deng Xiaoping en Shenzhen y Guangzhou, reactivando con vigor las reformas de mercado y consolidando el crecimiento del sur del país.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=Deng+Xiaoping+southern+tour+1992",
+        "img_illus_title": "Gira del Sur Deng Xiaoping",
+        "img_map": "https://tse1.mm.bing.net/th?q=Deng+Xiaoping+southern+tour+map+Shenzhen",
+        "img_map_title": "Mapa Ruta Gira del Sur Shenzhen",
+        "map_focus": "Ruta Shenzhen, Zhuhai y Delta de Cantón",
+        "wiki": "https://en.wikipedia.org/wiki/Deng_Xiaoping%27s_southern_tour",
+        "wiki_label": "Wikipedia: Deng's Southern Tour (en)",
+        "sinological_sources": [
+          {
+            "author": "Ray Huang",
+            "work": "Broadening the Horizons of Chinese History",
+            "chapters": "Cap. 9: «Socialist Market Economy and Quantitative Management in the South»",
+            "focus": "Analiza cómo la gira de Deng desató la capacidad cuantitativa industrial que el estado burocrático chino requería para despegar.",
+            "link": "https://www.worldcat.org/title/broadening-the-horizons-of-chinese-history-discourses-on-economic-and-social-change/oclc/40305608",
+            "link_type": "Ficha bibliográfica (WorldCat)"
+          }
+        ]
+      },
+      {
+        "id": "e5_2",
+        "year_display": "1997",
+        "year_val": 1997,
+        "title": "Retorno de Hong Kong a Soberanía China",
+        "stage_pos": "Fase ascendente hacia 2008",
+        "desc": "Retorno de Hong Kong a soberanía china tras más de siglo y medio de gobierno colonial británico, bajo el marco de 'Un país, dos sistemas'.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=Hong+Kong+handover+ceremony+1997",
+        "img_illus_title": "Handover Hong Kong 1997",
+        "img_map": "https://tse1.mm.bing.net/th?q=Hong+Kong+Greater+Bay+Area+map",
+        "img_map_title": "Mapa Hong Kong y Shenzhen",
+        "map_focus": "Territorio de Hong Kong y bahía adyacente",
+        "wiki": "https://es.wikipedia.org/wiki/Transferencia_de_soberan%C3%ADa_de_Hong_Kong",
+        "wiki_label": "Wikipedia: Retorno de Hong Kong",
+        "sinological_sources": [
+          {
+            "author": "Mizoguchi Yūzō",
+            "work": "Chūgoku to shite no sekai (China como método, 1989)",
+            "chapters": "Cap. 2: «El principio plural de la soberanía asiática frente al derecho colonial»",
+            "focus": "Explica la reintegración de Hong Kong como la primera gran reversión asiática del orden colonial eurocéntrico del siglo XIX.",
+            "link": "https://www.worldcat.org/title/chugoku-to-shite-no-sekai/oclc/21262456",
+            "link_type": "Ficha bibliográfica (WorldCat)"
+          }
+        ]
+      },
+      {
+        "id": "e5_3",
+        "year_display": "2001",
+        "year_val": 2001,
+        "title": "Ingreso a la Organización Mundial del Comercio",
+        "stage_pos": "Fase ascendente de la onda",
+        "desc": "Ingreso a la Organización Mundial del Comercio (OMC), integrando a China en el centro neurálgico del comercio global como principal potencia exportadora.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=China+joins+WTO+2001",
+        "img_illus_title": "China OMC 2001",
+        "img_map": "https://tse1.mm.bing.net/th?q=China+global+exports+map",
+        "img_map_title": "Mapa Exportaciones Chinas Globales",
+        "map_focus": "Cadenas logísticas marítimas mundiales",
+        "wiki": "https://en.wikipedia.org/wiki/China_and_the_World_Trade_Organization",
+        "wiki_label": "Wikipedia: China y la OMC (en)",
+        "sinological_sources": [
+          {
+            "author": "Ray Huang",
+            "work": "China: A Macro History",
+            "chapters": "Epílogo: «China Enters the World Trade Organization: Achieving Monetary Management»",
+            "focus": "Sostiene que la entrada a la OMC certificó que China alcanzó la gestión numérica integral ausente durante los Ming y Qing.",
+            "link": "https://www.routledge.com/China-A-Macro-History/Huang/p/book/9781563247316",
+            "link_type": "Editorial / Catálogo"
+          }
+        ]
+      },
+      {
+        "id": "e5_4",
+        "year_display": "2008",
+        "year_val": 2008,
+        "title": "Juegos Olímpicos de Pekín 2008",
+        "stage_pos": "Cresta geométrica (2008)",
+        "desc": "Juegos Olímpicos de Pekín en el Estadio 'Nido de Pájaro', simbolizando el renacimiento internacional chino en simultáneo con la crisis financiera occidental.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=Beijing+Olympics+opening+ceremony+2008",
+        "img_illus_title": "Juegos Olimpicos Beijing 2008",
+        "img_map": "https://tse1.mm.bing.net/th?q=Beijing+Olympic+Park+map+2008",
+        "img_map_title": "Mapa Nido de Pájaro Beijing",
+        "map_focus": "Parque Olímpico al norte de Pekín",
+        "wiki": "https://es.wikipedia.org/wiki/Juegos_Ol%C3%ADmpicos_de_Pek%C3%ADn_2008",
+        "wiki_label": "Wikipedia: JJ.OO. Pekín 2008",
+        "sinological_sources": [
+          {
+            "author": "Ray Huang",
+            "work": "China: A Macro History",
+            "chapters": "Sección conmemorativa: «The 2008 Olympics and the Spectacle of State Capacity»",
+            "focus": "Resalta la impresionante demostración de disciplina logística, fiscal y de infraestructura en el Parque Olímpico.",
+            "link": "https://www.routledge.com/China-A-Macro-History/Huang/p/book/9781563247316",
+            "link_type": "Editorial / Catálogo"
+          }
+        ]
+      },
+      {
+        "id": "e5_5",
+        "year_display": "2012",
+        "year_val": 2012,
+        "title": "Xi Jinping asume el poder",
+        "stage_pos": "Fase descendente hacia 2030",
+        "desc": "Xi Jinping asume el poder en el XVIII Congreso del PCCh, impulsando la revitalización nacional, la disciplina partidaria y el desarrollo tecnológico propio.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=Xi+Jinping+general+secretary+2012",
+        "img_illus_title": "Xi Jinping 2012",
+        "img_map": "https://tse1.mm.bing.net/th?q=Zhongnanhai+Beijing+map",
+        "img_map_title": "Mapa Zhongnanhai Beijing",
+        "map_focus": "Sede gubernamental de Zhongnanhai en Pekín",
+        "wiki": "https://es.wikipedia.org/wiki/Xi_Jinping",
+        "wiki_label": "Wikipedia: Xi Jinping",
+        "sinological_sources": [
+          {
+            "author": "Mizoguchi Yūzō",
+            "work": "Chūgoku to shite no sekai",
+            "chapters": "Cap. 3: «La tradición comunitaria y la lógica autónoma del poder político en China»",
+            "focus": "Plantea que la centralización del liderazgo debe interpretarse desde la tradición histórica china y no como una anomalía democrática.",
+            "link": "https://www.worldcat.org/title/chugoku-to-shite-no-sekai/oclc/21262456",
+            "link_type": "Ficha bibliográfica (WorldCat)"
+          }
+        ]
+      },
+      {
+        "id": "e5_6",
+        "year_display": "2013",
+        "year_val": 2013,
+        "title": "Lanzamiento de la Nueva Ruta de la Seda",
+        "stage_pos": "Fase descendente hacia 2030",
+        "desc": "Lanzamiento de la Nueva Ruta de la Seda (Iniciativa de la Franja y la Ruta), tejiendo redes comerciales e infraestructuras a través de Eurasia y África.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=Belt+and+Road+Initiative+train",
+        "img_illus_title": "Nueva Ruta de la Seda tren",
+        "img_map": "https://tse1.mm.bing.net/th?q=Belt+and+Road+Initiative+global+map",
+        "img_map_title": "Mapa Nueva Ruta de la Seda Global",
+        "map_focus": "Corredores terrestres y rutas marítimas globales",
+        "wiki": "https://es.wikipedia.org/wiki/Iniciativa_de_la_Franja_y_la_Ruta",
+        "wiki_label": "Wikipedia: Franja y la Ruta",
+        "sinological_sources": [
+          {
+            "author": "Mizoguchi Yūzō",
+            "work": "Chūgoku to shite no sekai",
+            "chapters": "Cap. 4: «El orden mundial policéntrico y la red comercial euroasiática»",
+            "focus": "Examina la Franja y la Ruta como la reconfiguración contemporánea de un orden comercial no supeditado a los dictados de Occidente.",
+            "link": "https://www.worldcat.org/title/chugoku-to-shite-no-sekai/oclc/21262456",
+            "link_type": "Ficha bibliográfica (WorldCat)"
+          }
+        ]
+      },
+      {
+        "id": "e5_7",
+        "year_display": "2020-2022",
+        "year_val": 2021,
+        "title": "Política 'Cero COVID'",
+        "stage_pos": "Fase descendente hacia 2030",
+        "desc": "Política 'Cero COVID' caracterizada por pruebas masivas, confinamientos selectivos y estricto control epidemiológico en Wuhan y todo el territorio nacional.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=China+Zero+Covid+mass+testing",
+        "img_illus_title": "Test masivo COVID China",
+        "img_map": "https://tse1.mm.bing.net/th?q=Wuhan+lockdown+map+2020",
+        "img_map_title": "Mapa Confinamiento Wuhan",
+        "map_focus": "Wuhan y cuenca del río Yangtsé",
+        "wiki": "https://es.wikipedia.org/wiki/Confinamiento_de_Hubei_de_2020",
+        "wiki_label": "Wikipedia: Confinamiento Wuhan",
+        "sinological_sources": [
+          {
+            "author": "Flora Botton Beja",
+            "work": "Estudios de Asia y África (El Colegio de México)",
+            "chapters": "Artículos: «Estado, colectividad y crisis sanitaria: El modelo de gestión de la pandemia en China»",
+            "focus": "Analiza la subordinación de la economía individual a la salud pública colectiva bajo la tradición del contrato social estatal.",
+            "link": "https://estudiosdeasiayafrica.colmex.mx/",
+            "link_type": "Revista Académica (Colmex)"
+          }
+        ]
+      },
+      {
+        "id": "e5_8",
+        "year_display": "2023-2026",
+        "year_val": 2025,
+        "title": "Autos eléctricos y fricción geopolítica",
+        "stage_pos": "Aproximación al valle de 2030",
+        "desc": "Autos eléctricos y fricción geopolítica en el Estrecho de Taiwán, en medio de la transición global hacia energías verdes y tensiones comerciales multipolares.",
+        "img_illus": "https://tse1.mm.bing.net/th?q=Chinese+electric+vehicles+BYD+export",
+        "img_illus_title": "BYD Autos Electricos China",
+        "img_map": "https://tse1.mm.bing.net/th?q=Taiwan+Strait+tensions+map+2024",
+        "img_map_title": "Mapa Tensiones Estrecho Taiwan 2024",
+        "map_focus": "Estrecho de Taiwán y rutas navales comerciales",
+        "wiki": "https://es.wikipedia.org/wiki/Autom%C3%B3viles_el%C3%A9ctricos_en_China",
+        "wiki_label": "Wikipedia: Autos Eléctricos China",
+        "sinological_sources": [
+          {
+            "author": "Flora Botton Beja",
+            "work": "Conferencias y ensayos en El Colegio de México",
+            "chapters": "Ensayo: «El Sur Global y el final de la hegemonía occidental: Transición verde y soberanía tecnológica»",
+            "focus": "Señala cómo el liderazgo tecnológico en baterías y autos eléctricos rompe la dependencia histórica de China frente a Occidente.",
+            "link": "https://libros.colmex.mx/tienda/china-su-historia-y-cultura-hasta-el-siglo-xxi/",
+            "link_type": "Editorial (El Colegio de México)"
+          }
+        ]
+      }
+    ]
+  },
+  {
+    "id": 6,
+    "name": "6. Hacia 2050: El Orden Futuro",
+    "wave": "Onda 6: Valle (2030) ➔ Cresta (2050)",
+    "start_year": 2030,
+    "crest_year": 2050,
+    "end_year": 2050,
+    "is_half_wave": true,
+    "western": {
+      "is_question_mark": true,
+      "title": "Escenarios Globales e Incertidumbre"
+    },
+    "authors": [],
+    "events": []
+  }
+];
+
+    const timelineCanvas = document.getElementById('timelineCanvas');
+    const viewport = document.getElementById('timelineViewport');
+
+    let stripWidth = 600;
+    let waveHeight = 310;
+    let yValle = 255;
+    let yCresta = 45;
+    let yMid = (yValle + yCresta) / 2;
+    let ampHalf = (yValle - yCresta) / 2;
+
+    function calcWaveY(t) {
+      return yMid + ampHalf * Math.cos(2 * Math.PI * t);
+    }
+
+    function handleImgError(img) {
+      if (img && img.parentElement) {
+        img.parentElement.classList.add('img-fallback-active');
+      }
+    }
+
+    const infoBtn = document.getElementById('infoBtn');
+    const infoPopover = document.getElementById('infoPopover');
+
+    infoBtn.addEventListener('click', (e) => {
+      e.stopPropagation();
+      infoPopover.classList.toggle('active');
+    });
+
+    document.addEventListener('click', (e) => {
+      if (!infoPopover.contains(e.target) && e.target !== infoBtn) {
+        infoPopover.classList.remove('active');
+      }
+    });
+
+    function renderTimeline() {
+      timelineCanvas.innerHTML = '';
+
+      const isMobile = window.innerWidth <= 500;
+      const baseStripWidth = isMobile ? Math.floor(window.innerWidth * 0.90) : 600;
+      waveHeight = isMobile ? 175 : 310;
+      yValle = isMobile ? 145 : 255;
+      yCresta = isMobile ? 30 : 45;
+      yMid = (yValle + yCresta) / 2;
+      ampHalf = (yValle - yCresta) / 2;
+
+      // Calcular ancho total del canvas considerando la última franja de mitad de ancho
+      let totalCanvasWidth = 0;
+      stagesData.forEach(stage => {
+        totalCanvasWidth += stage.is_half_wave ? Math.floor(baseStripWidth / 2) : baseStripWidth;
+      });
+      timelineCanvas.style.width = `${totalCanvasWidth}px`;
+
+      stagesData.forEach((stage, sIdx) => {
+        const thisWidth = stage.is_half_wave ? Math.floor(baseStripWidth / 2) : baseStripWidth;
+        const strip = document.createElement('div');
+        strip.className = 'time-strip' + (stage.is_half_wave ? ' half-strip' : '');
+        strip.style.width = `${thisWidth}px`;
+        strip.id = `stage-${stage.id}`;
+
+        const header = document.createElement('div');
+        header.className = 'strip-header';
+        const dateRangeText = stage.is_half_wave 
+          ? `${stage.start_year} - ${stage.crest_year}`
+          : `${stage.start_year} - ${stage.end_year}`;
+
+        header.innerHTML = `
+          <div class="strip-tag" style="color: var(--stage${stage.id}-color)">Franja ${stage.id} • ${dateRangeText}</div>
+          <div class="strip-title">${stage.name}</div>
+          <div class="strip-wave-formula">${stage.wave}</div>
+        `;
+        strip.appendChild(header);
+
+        const waveBox = document.createElement('div');
+        waveBox.className = 'wave-stage-box';
+
+        let dPath = `M 0 ${yValle}`;
+        const steps = 100;
+        const isHalf = !!stage.is_half_wave;
+
+        for (let i = 0; i <= steps; i++) {
+          const t = i / steps;
+          const x = t * thisWidth;
+          // Si es media onda: asciende con suavidad cosenoidal desde el valle (t=0) a la cresta (t=1)
+          const y = isHalf 
+            ? yMid + ampHalf * Math.cos(Math.PI * t) 
+            : calcWaveY(t);
+          dPath += ` L ${x} ${y}`;
+        }
+
+        const valleyTextEnd = isHalf 
+          ? '' 
+          : `<text x="${thisWidth - 145}" y="${yValle - 7}" fill="#64748b" font-size="9.5" font-family="sans-serif">Valle Redondeado (${stage.end_year})</text>`;
+
+        const crestPos = isHalf 
+          ? `<text x="${thisWidth - 85}" y="${yCresta - 9}" fill="var(--gold)" font-size="10" font-weight="bold" font-family="sans-serif">▲ Cresta (${stage.crest_year})</text>`
+          : `<text x="${thisWidth/2 - 42}" y="${yCresta - 9}" fill="var(--gold)" font-size="10" font-weight="bold" font-family="sans-serif">▲ Cresta (${stage.crest_year})</text>`;
+
+        const svgWave = `
+          <svg class="wave-svg" viewBox="0 0 ${thisWidth} ${waveHeight}" preserveAspectRatio="none">
+            <defs>
+              <linearGradient id="gradWave${stage.id}" x1="0%" y1="0%" x2="0%" y2="100%">
+                <stop offset="0%" stop-color="var(--stage${stage.id}-color)" stop-opacity="0.32"/>
+                <stop offset="100%" stop-color="var(--stage${stage.id}-color)" stop-opacity="0.0"/>
+              </linearGradient>
+            </defs>
+            <path d="${dPath} L ${thisWidth} ${waveHeight} L 0 ${waveHeight} Z" fill="url(#gradWave${stage.id})" />
+            <line x1="0" y1="${yValle}" x2="${thisWidth}" y2="${yValle}" stroke="#334155" stroke-width="1.2" stroke-dasharray="4,4"/>
+            <text x="14" y="${yValle - 7}" fill="#64748b" font-size="9.5" font-family="sans-serif">Valle (${stage.start_year})</text>
+            ${valleyTextEnd}
+            ${crestPos}
+            <path d="${dPath}" fill="none" stroke="var(--stage${stage.id}-color)" stroke-width="3.2" stroke-linecap="round"/>
+          </svg>
+        `;
+        waveBox.innerHTML = svgWave;
+
+        if (stage.events && stage.events.length > 0) {
+          stage.events.forEach((ev, evIdx) => {
+            let tHalf;
+            if (ev.year_val <= stage.crest_year) {
+              tHalf = ((ev.year_val - stage.start_year) / (stage.crest_year - stage.start_year)) * 0.5;
+            } else {
+              tHalf = 0.5 + ((ev.year_val - stage.crest_year) / (stage.end_year - stage.crest_year)) * 0.5;
+            }
+            tHalf = Math.max(0.015, Math.min(0.985, tHalf));
+
+            const posX = tHalf * thisWidth;
+            const posY = calcWaveY(tHalf);
+
+            const node = document.createElement('div');
+            node.className = 'event-node';
+            node.style.left = `${posX}px`;
+            node.style.top = `${posY}px`;
+
+            const isBelow = (posY < (isMobile ? 60 : 100));
+            node.innerHTML = `
+              <div class="node-label ${isBelow ? 'label-below' : ''}">${ev.year_display}</div>
+              <div class="node-pin">
+                <div class="node-inner"></div>
+              </div>
+            `;
+
+            node.addEventListener('click', (e) => {
+              e.stopPropagation();
+              openModal(ev, stage);
+            });
+
+            waveBox.appendChild(node);
+          });
+        }
+
+        strip.appendChild(waveBox);
+
+        const western = document.createElement('div');
+        western.className = 'western-panel';
+
+        if (stage.western && stage.western.is_question_mark) {
+          western.innerHTML = `
+            <div class="western-badge" style="color: var(--stage6-color);">Contexto Occidental</div>
+            <div class="western-title" style="text-align: center; font-size: 0.82rem;">${stage.western.title}</div>
+            <div class="western-question-box">
+              <div class="giant-question-mark">?</div>
+              <div class="question-caption">Incertidumbre</div>
+            </div>
+          `;
+        } else {
+          western.innerHTML = `
+            <div class="western-header-row">
+              <div class="western-badge">Contexto Occidental Paralelo</div>
+              ${stage.western.wiki ? `
+              <a class="external-article-link" href="${stage.western.wiki}" target="_blank" rel="noopener noreferrer" title="Ver artículo en Wikipedia">
+                <span>📖</span> <span>Wikipedia</span> &nearr;
+              </a>` : ''}
+            </div>
+            <div class="western-title">${stage.western.title}</div>
+            ${stage.western.centro ? `
+            <div class="western-centro">
+              <span class="western-centro-label">Centro:</span>
+              <span class="western-centro-val">${stage.western.centro}</span>
+            </div>` : ''}
+            <div class="western-content-row">
+              <div class="western-img-wrap" id="westernWrap${stage.id}">
+                <img src="${stage.western.img}" alt="${stage.western.img_label}" onerror="handleImgError(this)">
+                <div class="img-placeholder-fallback">
+                  <div class="icon">🏛️</div>
+                  <div class="title">${stage.western.img_label}</div>
+                  <div class="sub">Imagen referenciada en documento MD</div>
+                </div>
+              </div>
+              <div class="western-desc">${stage.western.desc}</div>
+            </div>
+
+            <div class="authors-accordion">
+              <div class="authors-title">Paralelo de Sinólogos & Autores</div>
+              <ul class="authors-list">
+                ${stage.authors.map(a => `<li>
+                  <strong>${a.author}:</strong> ${a.text}
+                  <div style="margin-top: 4px; font-size: 0.65rem; display: flex; gap: 8px; align-items: center;">
+                    <a href="${a.unal_url}" target="_blank" style="color: var(--cyan); text-decoration: none; border-bottom: 1px dashed var(--cyan);">🔍 Buscar en UNAL</a>
+                    <span style="color: #475569;">|</span>
+                    <a href="${a.google_url}" target="_blank" style="color: var(--gold-light); text-decoration: none; border-bottom: 1px dashed var(--gold-light);">🌐 Buscar en Google (Alternativa)</a>
+                  </div>
+                </li>`).join('')}
+              </ul>
+            </div>
+          `;
+        }
+
+        strip.appendChild(western);
+
+        timelineCanvas.appendChild(strip);
+      });
+    }
+
+    const modalOverlay = document.getElementById('modalOverlay');
+    const modalYear = document.getElementById('modalYear');
+    const modalStagePos = document.getElementById('modalStagePos');
+    const modalTitle = document.getElementById('modalTitle');
+    const modalWikiLink = document.getElementById('modalWikiLink');
+    const modalWikiLabel = document.getElementById('modalWikiLabel');
+    const modalIllusImg = document.getElementById('modalIllusImg');
+    const modalIllusCard = document.getElementById('modalIllusCard');
+    const modalIllusCaption = document.getElementById('modalIllusCaption');
+    const modalIllusSrc = document.getElementById('modalIllusSrc');
+    const modalIllusFallbackTitle = document.getElementById('modalIllusFallbackTitle');
+    const modalDesc = document.getElementById('modalDesc');
+
+    const modalMapImg = document.getElementById('modalMapImg');
+    const modalMapCard = document.getElementById('modalMapCard');
+    const modalMapCaption = document.getElementById('modalMapCaption');
+    const modalMapSrc = document.getElementById('modalMapSrc');
+    const modalMapFallbackTitle = document.getElementById('modalMapFallbackTitle');
+    const modalMapDetails = document.getElementById('modalMapDetails');
+
+    function openModal(eventData, stageData) {
+      modalYear.textContent = eventData.year_display;
+      modalStagePos.textContent = `${stageData.wave} • ${eventData.stage_pos}`;
+      modalTitle.textContent = eventData.title;
+
+      // Configurar enlace a Wikipedia o búsqueda externa
+      if (eventData.wiki) {
+        modalWikiLink.href = eventData.wiki;
+        modalWikiLabel.textContent = eventData.wiki_label || "Artículo en Wikipedia";
+        modalWikiLink.style.display = "inline-flex";
+      } else {
+        const query = encodeURIComponent(`${eventData.title} historia china`);
+        modalWikiLink.href = `https://www.google.com/search?q=${query}`;
+        modalWikiLabel.textContent = "Buscar en Google";
+        modalWikiLink.style.display = "inline-flex";
+      }
+
+      modalIllusCard.classList.remove('img-fallback-active');
+      modalMapCard.classList.remove('img-fallback-active');
+
+      modalIllusImg.src = eventData.img_illus;
+      modalIllusCaption.textContent = eventData.img_illus_title;
+      modalIllusFallbackTitle.textContent = eventData.img_illus_title;
+      modalIllusSrc.textContent = "Referencia MD";
+      
+      modalDesc.innerHTML = `<p>${eventData.desc}</p>`;
+
+      const modalAuthorsContainer = document.getElementById('modalAuthorsContainer');
+      if (eventData.sinological_sources && eventData.sinological_sources.length > 0) {
+        modalAuthorsContainer.style.display = 'flex';
+        modalAuthorsContainer.innerHTML = `
+          <div class="modal-authors-header">
+            <span>📚</span> <span>Obras & Sinología del Siglo XX Referente:</span>
+          </div>
+          <div class="modal-authors-list">
+            ${eventData.sinological_sources.map(src => `
+              <div class="author-source-card">
+                <div class="author-name-row">
+                  <strong>${src.author}</strong>
+                  <a class="author-work-link" href="${src.link}" target="_blank" rel="noopener noreferrer" title="${src.link_type}">
+                    ${src.link_type} &nearr;
+                  </a>
+                </div>
+                <div class="author-work-title">${src.work}</div>
+                <div class="author-chapters">${src.chapters}</div>
+                <div class="author-focus">${src.focus}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      } else {
+        modalAuthorsContainer.style.display = 'none';
+      }
+
+      modalMapImg.src = eventData.img_map;
+      modalMapCaption.textContent = eventData.img_map_title;
+      modalMapFallbackTitle.textContent = eventData.img_map_title;
+      modalMapSrc.textContent = "Referencia MD";
+      modalMapDetails.innerHTML = `
+        <p style="margin-bottom: 6px;"><strong>Enfoque Territorial:</strong> ${eventData.map_focus}</p>
+        <p style="font-size: 0.82rem; color: #94a3b8;">Imagen cartográfica referenciada exactamente en <em>Investigacion_V2.md</em> para ubicar el acontecimiento.</p>
+      `;
+
+      modalOverlay.classList.add('active');
+    }
+
+    function closeModal() {
+      modalOverlay.classList.remove('active');
+    }
+
+    modalOverlay.addEventListener('click', (e) => {
+      if (e.target === modalOverlay) closeModal();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape') closeModal();
+    });
+
+    function scrollTimeline(offset) {
+      viewport.scrollBy({ left: offset, behavior: 'smooth' });
+    }
+
+    function scrollToStage(stageId) {
+      const el = document.getElementById(`stage-${stageId}`);
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', inline: 'start' });
+      }
+    }
+
+    let isDown = false;
+    let startX;
+    let scrollLeft;
+
+    viewport.addEventListener('mousedown', (e) => {
+      isDown = true;
+      startX = e.pageX - viewport.offsetLeft;
+      scrollLeft = viewport.scrollLeft;
+    });
+
+    viewport.addEventListener('mouseleave', () => { isDown = false; });
+    viewport.addEventListener('mouseup', () => { isDown = false; });
+
+    viewport.addEventListener('mousemove', (e) => {
+      if (!isDown) return;
+      e.preventDefault();
+      const x = e.pageX - viewport.offsetLeft;
+      const walk = (x - startX) * 1.5;
+      viewport.scrollLeft = scrollLeft - walk;
+    });
+
+    viewport.addEventListener('wheel', (e) => {
+      if (e.deltaY !== 0) {
+        e.preventDefault();
+        viewport.scrollLeft += e.deltaY;
+      }
+    });
+
+    renderTimeline();
+
+    let resizeTimer;
+    window.addEventListener('resize', () => {
+      clearTimeout(resizeTimer);
+      resizeTimer = setTimeout(renderTimeline, 100);
+    });
+  </script>
+</body>
+</html>
